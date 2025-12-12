@@ -1,32 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 import { caseStatuses, teamMembers, type CaseItem, type CaseStatus } from "@/lib/case-types";
-import { useCases, useCreateCase, useReassignCase, useUpdateCaseStatus } from "@/lib/case-hooks";
+import { useCases, useReassignCase, useUpdateCaseStatus } from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
-
-const createCaseSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  client: z.string().min(2, "Client must be at least 2 characters"),
-  description: z.string().max(500, "Description must be 500 characters or less").optional(),
-  status: z.enum(caseStatuses),
-  assignee: z.enum(teamMembers),
-});
-
-type CreateCaseValues = z.infer<typeof createCaseSchema>;
 
 function statusBadgeVariant(status: CaseStatus) {
   switch (status) {
@@ -67,21 +51,8 @@ function groupByAssignee(cases: CaseItem[]) {
 
 export function DashboardClient() {
   const casesQuery = useCases();
-  const createCaseMut = useCreateCase();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
-
-  const form = useForm<CreateCaseValues>({
-    resolver: zodResolver(createCaseSchema),
-    defaultValues: {
-      title: "",
-      client: "",
-      description: "",
-      status: "new",
-      assignee: "Alex",
-    },
-    mode: "onSubmit",
-  });
 
   const cases = casesQuery.data ?? [];
 
@@ -97,17 +68,6 @@ export function DashboardClient() {
   }, [cases]);
 
   const byAssignee = React.useMemo(() => groupByAssignee(cases), [cases]);
-
-  async function onSubmit(values: CreateCaseValues) {
-    await createCaseMut.mutateAsync({
-      title: values.title,
-      client: values.client,
-      description: values.description || undefined,
-      status: values.status,
-      assignee: values.assignee,
-    });
-    form.reset({ title: "", client: "", description: "", status: "new", assignee: values.assignee });
-  }
 
   return (
     <div className="space-y-8">
@@ -289,121 +249,18 @@ export function DashboardClient() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Create a case</CardTitle>
-              <CardDescription>Validated form (React Hook Form + Zod).</CardDescription>
+              <CardTitle>New case</CardTitle>
+              <CardDescription>
+                Create cases from the dedicated intake page (more fields, attachments, dates).
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. Intake: new claim" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="client"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Client</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. Northwind Logistics" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Optional context and next steps…" {...field} />
-                        </FormControl>
-                        <FormDescription>Optional. Keep it short and actionable.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select status" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {caseStatuses.map((s) => (
-                                <SelectItem key={s} value={s}>
-                                  {statusLabel(s)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="assignee"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Assignee</FormLabel>
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select assignee" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {teamMembers.map((m) => (
-                                <SelectItem key={m} value={m}>
-                                  {m}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <Separator />
-
-                  <Button type="submit" className="w-full" disabled={createCaseMut.isPending}>
-                    {createCaseMut.isPending ? (
-                      <>
-                        <Loader2 className="animate-spin" />
-                        Creating…
-                      </>
-                    ) : (
-                      "Create case"
-                    )}
-                  </Button>
-                </form>
-              </Form>
+            <CardContent className="space-y-3">
+              <div className="text-sm text-muted-foreground">
+                Use the full intake form to capture incident date/time, priority, and attachments.
+              </div>
+              <Button asChild className="w-full">
+                <Link href="/dashboard/cases/new">Create a new case</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

@@ -1,4 +1,4 @@
-import { type CaseItem, type CaseStatus, teamMembers } from "@/lib/case-types";
+import { type CaseAttachment, type CaseItem, type CasePriority, type CaseStatus, teamMembers } from "@/lib/case-types";
 
 const STORAGE_KEY = "casecypher:cases:v1";
 
@@ -88,6 +88,10 @@ export type CreateCaseInput = {
   description?: string;
   status: CaseStatus;
   assignee: string;
+  priority?: CasePriority;
+  incidentDate?: string;
+  incidentTime?: string;
+  attachments?: CaseAttachment[];
 };
 
 function makeId(existing: CaseItem[]) {
@@ -109,6 +113,10 @@ export async function createCase(input: CreateCaseInput): Promise<CaseItem> {
     description: input.description?.trim() || undefined,
     status: input.status,
     assignee: input.assignee,
+    priority: input.priority,
+    incidentDate: input.incidentDate,
+    incidentTime: input.incidentTime,
+    attachments: input.attachments?.length ? input.attachments : undefined,
     createdAt: t,
     updatedAt: t,
   };
