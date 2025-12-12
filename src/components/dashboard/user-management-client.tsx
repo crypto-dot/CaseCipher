@@ -31,7 +31,7 @@ type UserRecord = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "casecypher.users.v1";
+const STORAGE_KEY = "casecipher.users.v1";
 
 const ALL_PERMISSIONS: Permission[] = [
   "cases:read",

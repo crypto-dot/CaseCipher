@@ -1,6 +1,6 @@
-import { type CaseAttachment, type CaseItem, type CasePriority, type CaseStatus, teamMembers } from "@/lib/case-types";
-
-const STORAGE_KEY = "casecypher:cases:v1";
+import { type CaseAttachment, type CaseItem, type CasePriority, type CaseStatus, type TeamMember, teamMembersSchema } from "@/lib/case-types";
+import {z} from "zod";
+const STORAGE_KEY = "casecipher:cases:v1";
 
 function nowIso() {
   return new Date().toISOString();
@@ -151,7 +151,7 @@ export async function reassignCase(params: {
   const items = readAll();
   const idx = items.findIndex((c) => c.id === params.id);
   if (idx < 0) throw new Error("Case not found");
-  const assignee = teamMembers.includes(params.assignee as never)
+  const assignee = teamMembersSchema.safeParse(params.assignee).success
     ? params.assignee
     : items[idx].assignee;
   const updated: CaseItem = {

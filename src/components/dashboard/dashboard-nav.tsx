@@ -30,7 +30,7 @@ export function DashboardNav() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-sm font-medium">Dashboard</div>
-          <div className="text-xs text-muted-foreground">CaseCypher workspace</div>
+          <div className="text-xs text-muted-foreground">CaseCipher workspace</div>
         </div>
         <Badge variant="outline" className="hidden md:inline-flex">
           Menu

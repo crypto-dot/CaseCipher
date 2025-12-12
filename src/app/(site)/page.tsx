@@ -20,7 +20,7 @@ export default function Home() {
                 Case management, encrypted-by-design workflow (frontend mock)
               </p>
               <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-                CaseCypher keeps your team aligned on every case.
+                CaseCipher keeps your team aligned on every case.
               </h1>
               <p className="max-w-xl text-pretty text-lg leading-7 text-muted-foreground">
                 Track status, ownership, and work-in-progress in one clean dashboard. Create cases in seconds, route

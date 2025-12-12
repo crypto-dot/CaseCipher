@@ -5,7 +5,7 @@ import { Moon, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-const STORAGE_KEY = "casecypher:theme";
+const STORAGE_KEY = "casecipher:theme";
 
 function getIsDark() {
   if (typeof document === "undefined") return false;

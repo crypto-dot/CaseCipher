@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { caseStatuses, teamMembers, type CaseItem, type CaseStatus } from "@/lib/case-types";
+import { caseStatusesSchema, TeamMember, teamMembersSchema, type CaseItem, type CaseStatus } from "@/lib/case-types";
 import { useCases, useReassignCase, useUpdateCaseStatus } from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
 
@@ -136,7 +136,7 @@ export function DashboardClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
             <CardTitle>Cases</CardTitle>
-            <Button asChild className="w-fit relative top-[10px]">
+            <Button asChild className="w-fit relative top-[10px] border-2 border-primary">
                 <Link href="/dashboard/cases/new">Create a new case</Link>
               </Button>
             </div>
@@ -182,9 +182,9 @@ export function DashboardClient() {
                           <SelectValue placeholder="Select assignee" />
                         </SelectTrigger>
                         <SelectContent>
-                          {teamMembers.map((m) => (
+                          {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => (
                             <SelectItem key={m} value={m}>
-                              {m}
+                              {m.replace("_", " ")}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -204,7 +204,7 @@ export function DashboardClient() {
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          {caseStatuses.map((s) => (
+                          {(Object.keys(caseStatusesSchema) as Array<CaseStatus>).map((s: CaseStatus) => (
                             <SelectItem key={s} value={s}>
                               {statusLabel(s)}
                             </SelectItem>
@@ -223,14 +223,13 @@ export function DashboardClient() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
+        <div className="space-y-6 h-full">
           <Card>
             <CardHeader>
-              <CardTitle>Who’s working on what</CardTitle>
-              <CardDescription>Workload by assignee.</CardDescription>
+              <CardTitle>Workload by assignee</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {teamMembers.map((m) => {
+              {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => {
                 const list = byAssignee.get(m) ?? [];
                 const active = list.filter((c) => c.status !== "resolved").length;
                 return (

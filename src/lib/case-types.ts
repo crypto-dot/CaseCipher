@@ -1,32 +1,38 @@
-export const caseStatuses = ["new", "in_progress", "blocked", "resolved"] as const;
-export type CaseStatus = (typeof caseStatuses)[number];
+import { z } from "zod";
 
-export const casePriorities = ["low", "medium", "high"] as const;
-export type CasePriority = (typeof casePriorities)[number];
+export const caseStatusesSchema = z.enum(["new", "in_progress", "blocked", "resolved"]);
+export type CaseStatus = z.infer<typeof caseStatusesSchema>;
 
-export type CaseAttachment = {
-  name: string;
-  size: number;
-  type: string;
-  lastModified: number;
-};
+export const casePrioritiesSchema = z.enum(["low", "medium", "high"]);
+export type CasePriority = z.infer<typeof casePrioritiesSchema>;
 
-export type CaseItem = {
-  id: string;
-  title: string;
-  client: string;
-  description?: string;
-  status: CaseStatus;
-  assignee: string;
-  priority?: CasePriority;
-  incidentDate?: string; // YYYY-MM-DD
-  incidentTime?: string; // HH:mm
-  attachments?: CaseAttachment[];
-  createdAt: string;
-  updatedAt: string;
-};
+export const caseAttachmentsSchema = z.object({
+  name: z.string(),
+  size: z.number(),
+  type: z.string(),
+  lastModified: z.number(),
+});
+export type CaseAttachment = z.infer<typeof caseAttachmentsSchema>;
 
-export const teamMembers = ["Alex", "Jordan", "Sam", "Taylor"] as const;
-export type TeamMember = (typeof teamMembers)[number];
+export const caseItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  client: z.string(),
+  description: z.string().optional(),
+  status: caseStatusesSchema,
+  assignee: z.string(),
+  priority: casePrioritiesSchema.optional(),
+  incidentDate: z.string().optional(),
+  incidentTime: z.string().optional(),
+  attachments: caseAttachmentsSchema.array().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+}); 
+
+export type CaseItem = z.infer<typeof caseItemSchema>;
+
+
+export const teamMembersSchema = z.enum(["Alex", "Jordan", "Sam", "Taylor"]);
+export type TeamMember = z.infer<typeof teamMembersSchema>;
 
 

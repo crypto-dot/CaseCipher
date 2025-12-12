@@ -9,9 +9,9 @@ export default function AboutPage() {
     <div className="mx-auto container px-4 py-14 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
         <div className="space-y-6">
-          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">About CaseCypher</h1>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">About CaseCipher</h1>
           <p className="max-w-2xl text-pretty text-lg leading-7 text-muted-foreground">
-            CaseCypher is a modern case management service built for teams that need speed, accountability, and a clean
+            CaseCipher is a modern case management service built for teams that need speed, accountability, and a clean
             source of truth. It keeps status, ownership, and key details in one place—so work moves forward without
             ambiguity.
           </p>

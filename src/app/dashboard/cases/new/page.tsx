@@ -20,9 +20,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { casePriorities, caseStatuses, teamMembers, type CaseAttachment } from "@/lib/case-types";
-import { cn } from "@/lib/utils";
+import { casePrioritiesSchema, CasePriority, caseStatusesSchema, TeamMember, teamMembersSchema, type CaseAttachment, type CaseStatus } from "@/lib/case-types";
 import { useCreateCase } from "@/lib/case-hooks";
+import { cn } from "@/lib/utils";
 
 function toAttachmentMeta(files: FileList | null): CaseAttachment[] {
   if (!files) return [];
@@ -38,9 +38,9 @@ const newCaseSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   client: z.string().min(2, "Client must be at least 2 characters"),
   description: z.string().max(2000, "Description must be 2000 characters or less").optional(),
-  status: z.enum(caseStatuses),
-  assignee: z.enum(teamMembers),
-  priority: z.enum(casePriorities).optional(),
+  status: caseStatusesSchema,
+  assignee: teamMembersSchema.optional(),
+  priority: casePrioritiesSchema,
   incidentDate: z.date().optional(),
   incidentTime: z
     .string()
@@ -50,20 +50,20 @@ const newCaseSchema = z.object({
   attachments: z.any().optional(), // FileList from <input type="file" />
 });
 
-type NewCaseValues = z.infer<typeof newCaseSchema>;
+type NewCaseTypes = z.infer<typeof newCaseSchema>;
 
 export default function NewCasePage() {
   const router = useRouter();
   const createCaseMut = useCreateCase();
 
-  const form = useForm<NewCaseValues>({
+  const form = useForm<NewCaseTypes>({
     resolver: zodResolver(newCaseSchema),
     defaultValues: {
       title: "",
       client: "",
       description: "",
       status: "new",
-      assignee: "Alex",
+      assignee: undefined,
       priority: "medium",
       incidentDate: undefined,
       incidentTime: "",
@@ -75,13 +75,13 @@ export default function NewCasePage() {
   const files = form.watch("attachments") as FileList | undefined;
   const fileMetas = React.useMemo(() => toAttachmentMeta(files ?? null), [files]);
 
-  async function onSubmit(values: NewCaseValues) {
+  async function onSubmit(values: NewCaseTypes) {
     await createCaseMut.mutateAsync({
       title: values.title,
       client: values.client,
       description: values.description || undefined,
       status: values.status,
-      assignee: values.assignee,
+      assignee: values.assignee || "",
       priority: values.priority,
       incidentDate: values.incidentDate ? format(values.incidentDate, "yyyy-MM-dd") : undefined,
       incidentTime: values.incidentTime || undefined,
@@ -169,7 +169,7 @@ export default function NewCasePage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {caseStatuses.map((s) => (
+                          {(Object.keys(caseStatusesSchema) as Array<CaseStatus>).map((s: CaseStatus) => (
                             <SelectItem key={s} value={s}>
                               {s.replace("_", " ")}
                             </SelectItem>
@@ -194,7 +194,7 @@ export default function NewCasePage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {teamMembers.map((m) => (
+                          {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => (
                             <SelectItem key={m} value={m}>
                               {m}
                             </SelectItem>
@@ -219,7 +219,7 @@ export default function NewCasePage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {casePriorities.map((p) => (
+                          {(Object.keys(casePrioritiesSchema) as Array<CasePriority>).map((p: CasePriority) => (
                             <SelectItem key={p} value={p}>
                               {p}
                             </SelectItem>
@@ -294,7 +294,7 @@ export default function NewCasePage() {
                   id="attachments"
                   type="file"
                   multiple
-                  onChange={(e) => form.setValue("attachments", e.target.files, { shouldValidate: true })}
+                  onChange={(e) => form.setValue("attachments", e.target.files as FileList, { shouldValidate: true })}
                 />
                 <div className="text-xs text-muted-foreground">
                   Attach files to this case. (This demo stores file metadata locally.)

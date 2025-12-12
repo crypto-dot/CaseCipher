@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CaseCypher — Modern case management",
+  title: "CaseCipher — Modern case management",
   description:
-    "CaseCypher is a case management SaaS for tracking ownership, status, and work-in-progress across your team.",
+    "CaseCipher is a case management SaaS for tracking ownership, status, and work-in-progress across your team.",
 };
 
 export default function RootLayout({
