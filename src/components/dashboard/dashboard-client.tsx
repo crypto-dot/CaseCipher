@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { caseStatuses, teamMembers, type CaseItem, type CaseStatus } from "@/lib/case-types";
 import { useCases, useReassignCase, useUpdateCaseStatus } from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
@@ -78,20 +79,25 @@ export function DashboardClient() {
             Manage cases, track status, and see who’s working on what.
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => casesQuery.refetch()}
-          disabled={casesQuery.isFetching}
-        >
-          {casesQuery.isFetching ? (
-            <>
-              <Loader2 className="animate-spin" />
-              Refreshing
-            </>
-          ) : (
-            "Refresh"
-          )}
-        </Button>
+        <div className="flex flex-col items-stretch gap-2 sm:items-end">
+          <div className="self-end">
+            <ThemeToggle />
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => casesQuery.refetch()}
+            disabled={casesQuery.isFetching}
+          >
+            {casesQuery.isFetching ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Refreshing
+              </>
+            ) : (
+              "Refresh"
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
@@ -128,7 +134,12 @@ export function DashboardClient() {
       <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <Card>
           <CardHeader>
+            <div className="flex items-center justify-between">
             <CardTitle>Cases</CardTitle>
+            <Button asChild className="w-fit relative top-[10px]">
+                <Link href="/dashboard/cases/new">Create a new case</Link>
+              </Button>
+            </div>
             <CardDescription>Status, ownership, and quick updates.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -244,23 +255,6 @@ export function DashboardClient() {
                   </div>
                 );
               })}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>New case</CardTitle>
-              <CardDescription>
-                Create cases from the dedicated intake page (more fields, attachments, dates).
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-sm text-muted-foreground">
-                Use the full intake form to capture incident date/time, priority, and attachments.
-              </div>
-              <Button asChild className="w-full">
-                <Link href="/dashboard/cases/new">Create a new case</Link>
-              </Button>
             </CardContent>
           </Card>
         </div>

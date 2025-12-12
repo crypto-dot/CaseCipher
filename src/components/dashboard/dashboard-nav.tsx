@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/cases/new", label: "New case" },
+  { href: "/dashboard/users", label: "User management" },
 ] as const;
 
 function isActive(pathname: string, href: string) {

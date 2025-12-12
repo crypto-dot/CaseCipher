@@ -9,13 +9,11 @@ export default function AboutPage() {
     <div className="mx-auto container px-4 py-14 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
         <div className="space-y-6">
-          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            About CaseCypher
-          </h1>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">About CaseCypher</h1>
           <p className="max-w-2xl text-pretty text-lg leading-7 text-muted-foreground">
-            CaseCypher is a modern case management service built for teams that need speed,
-            accountability, and a clean source of truth. It keeps status, ownership, and key details
-            in one place—so work moves forward without ambiguity.
+            CaseCypher is a modern case management service built for teams that need speed, accountability, and a clean
+            source of truth. It keeps status, ownership, and key details in one place—so work moves forward without
+            ambiguity.
           </p>
 
           <Separator />
@@ -72,9 +70,7 @@ export default function AboutPage() {
             <Button asChild variant="outline" className="w-full">
               <Link href="/">Back to landing</Link>
             </Button>
-            <p className="pt-2 text-xs text-muted-foreground">
-              This demo uses localStorage as a temporary “backend”.
-            </p>
+            <p className="pt-2 text-xs text-muted-foreground">This demo uses localStorage as a temporary “backend”.</p>
           </CardContent>
         </Card>
       </div>

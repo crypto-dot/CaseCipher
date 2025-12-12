@@ -23,8 +23,8 @@ export default function Home() {
                 CaseCypher keeps your team aligned on every case.
               </h1>
               <p className="max-w-xl text-pretty text-lg leading-7 text-muted-foreground">
-                Track status, ownership, and work-in-progress in one clean dashboard.
-                Create cases in seconds, route them to the right person, and keep a clear audit trail.
+                Track status, ownership, and work-in-progress in one clean dashboard. Create cases in seconds, route
+                them to the right person, and keep a clear audit trail.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button asChild size="lg">
@@ -54,9 +54,7 @@ export default function Home() {
               <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/10 via-transparent to-transparent" />
               <CardHeader>
                 <CardTitle>Operational snapshot</CardTitle>
-                <CardDescription>
-                  A quick view of case status and who’s actively working.
-                </CardDescription>
+                <CardDescription>A quick view of case status and who’s actively working.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-lg border bg-background/60 p-4">
@@ -144,9 +142,7 @@ export default function Home() {
           <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border bg-card p-6 sm:flex-row sm:items-center">
             <div>
               <div className="text-lg font-semibold tracking-tight">Ready to try it?</div>
-              <div className="text-sm text-muted-foreground">
-                Jump into the dashboard to see the case workflow.
-              </div>
+              <div className="text-sm text-muted-foreground">Jump into the dashboard to see the case workflow.</div>
             </div>
             <Button asChild>
               <Link href="/dashboard">Go to dashboard</Link>
@@ -157,3 +153,5 @@ export default function Home() {
     </div>
   );
 }
+
+

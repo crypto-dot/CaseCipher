@@ -316,7 +316,7 @@ export default function NewCasePage() {
 
               <Separator />
 
-              <Button type="submit" className="w-full" disabled={createCaseMut.isPending}>
+              <Button type="submit" className="w-fit" disabled={createCaseMut.isPending}>
                 {createCaseMut.isPending ? (
                   <>
                     <Loader2 className="animate-spin" />
