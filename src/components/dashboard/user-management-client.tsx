@@ -4,10 +4,22 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +57,14 @@ const ALL_PERMISSIONS: Permission[] = [
 const ROLE_DEFAULTS: Record<UserRole, Permission[]> = {
   Examiner: ["cases:read", "evidence:read"],
   Analyst: ["cases:read", "cases:write", "evidence:read", "evidence:write"],
-  Admin: ["cases:read", "cases:write", "evidence:read", "evidence:write", "users:manage", "system:settings"],
+  Admin: [
+    "cases:read",
+    "cases:write",
+    "evidence:read",
+    "evidence:write",
+    "users:manage",
+    "system:settings",
+  ],
 };
 
 function safeUuid() {
@@ -146,7 +165,9 @@ export function UserManagementClient() {
   const [newBadge, setNewBadge] = useState("");
   const [newRole, setNewRole] = useState<UserRole>("Examiner");
   const [customizeNewPermissions, setCustomizeNewPermissions] = useState(false);
-  const [newPermissions, setNewPermissions] = useState<Permission[]>(ROLE_DEFAULTS.Examiner);
+  const [newPermissions, setNewPermissions] = useState<Permission[]>(
+    ROLE_DEFAULTS.Examiner,
+  );
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -202,17 +223,24 @@ export function UserManagementClient() {
     const badgeNumber = newBadge.trim();
 
     if (!name) return setError("Name is required.");
-    if (!email || !isValidEmail(email)) return setError("Enter a valid email address.");
+    if (!email || !isValidEmail(email))
+      return setError("Enter a valid email address.");
     if (!badgeNumber) return setError("Badge number is required.");
 
     const emailTaken = users.some((u) => u.email.toLowerCase() === email);
     if (emailTaken) return setError("A user with that email already exists.");
 
-    const badgeTaken = users.some((u) => u.badgeNumber.toLowerCase() === badgeNumber.toLowerCase());
-    if (badgeTaken) return setError("A user with that badge number already exists.");
+    const badgeTaken = users.some(
+      (u) => u.badgeNumber.toLowerCase() === badgeNumber.toLowerCase(),
+    );
+    if (badgeTaken)
+      return setError("A user with that badge number already exists.");
 
-    const permissions = uniquePermissions(customizeNewPermissions ? newPermissions : ROLE_DEFAULTS[newRole]);
-    if (permissions.length === 0) return setError("Select at least one permission.");
+    const permissions = uniquePermissions(
+      customizeNewPermissions ? newPermissions : ROLE_DEFAULTS[newRole],
+    );
+    if (permissions.length === 0)
+      return setError("Select at least one permission.");
 
     const record: UserRecord = {
       id: safeUuid(),
@@ -237,9 +265,12 @@ export function UserManagementClient() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1">
-        <div className="text-2xl font-semibold tracking-tight">User Management</div>
+        <div className="text-2xl font-semibold tracking-tight">
+          User Management
+        </div>
         <div className="text-sm text-muted-foreground">
-          Create users, assign roles/permissions, and deactivate access. (Admin enforcement is handled elsewhere.)
+          Create users, assign roles/permissions, and deactivate access. (Admin
+          enforcement is handled elsewhere.)
         </div>
       </div>
 
@@ -291,7 +322,10 @@ export function UserManagementClient() {
 
               <div className="space-y-2">
                 <Label>Role</Label>
-                <Select value={newRole} onValueChange={(v) => setNewRole(v as UserRole)}>
+                <Select
+                  value={newRole}
+                  onValueChange={(v) => setNewRole(v as UserRole)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
@@ -311,7 +345,8 @@ export function UserManagementClient() {
                 <div>
                   <div className="text-sm font-medium">Permissions</div>
                   <div className="text-xs text-muted-foreground">
-                    Default permissions are assigned from the selected role unless you customize them.
+                    Default permissions are assigned from the selected role
+                    unless you customize them.
                   </div>
                 </div>
                 <label className="flex select-none items-center gap-2 text-sm">
@@ -319,7 +354,9 @@ export function UserManagementClient() {
                     type="checkbox"
                     className="h-4 w-4 accent-primary"
                     checked={customizeNewPermissions}
-                    onChange={(e) => setCustomizeNewPermissions(e.target.checked)}
+                    onChange={(e) =>
+                      setCustomizeNewPermissions(e.target.checked)
+                    }
                   />
                   Customize
                 </label>
@@ -327,13 +364,21 @@ export function UserManagementClient() {
 
               <div className="rounded-md border bg-muted/20 p-3">
                 <div className="flex flex-wrap gap-2">
-                  {(customizeNewPermissions ? newPermissions : ROLE_DEFAULTS[newRole]).map((p) => (
+                  {(customizeNewPermissions
+                    ? newPermissions
+                    : ROLE_DEFAULTS[newRole]
+                  ).map((p) => (
                     <Badge key={p} variant="outline">
                       {p}
                     </Badge>
                   ))}
-                  {(customizeNewPermissions ? newPermissions : ROLE_DEFAULTS[newRole]).length === 0 ? (
-                    <span className="text-sm text-muted-foreground">No permissions selected.</span>
+                  {(customizeNewPermissions
+                    ? newPermissions
+                    : ROLE_DEFAULTS[newRole]
+                  ).length === 0 ? (
+                    <span className="text-sm text-muted-foreground">
+                      No permissions selected.
+                    </span>
                   ) : null}
                 </div>
               </div>
@@ -341,15 +386,22 @@ export function UserManagementClient() {
               {customizeNewPermissions ? (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {ALL_PERMISSIONS.map((p) => (
-                    <label key={p} className="flex items-center gap-2 rounded-md border p-2 text-sm">
+                    <label
+                      key={p}
+                      className="flex items-center gap-2 rounded-md border p-2 text-sm"
+                    >
                       <input
                         type="checkbox"
                         className="h-4 w-4 accent-primary"
                         checked={newPermissions.includes(p)}
-                        onChange={() => setNewPermissions((prev) => togglePermission(prev, p))}
+                        onChange={() =>
+                          setNewPermissions((prev) => togglePermission(prev, p))
+                        }
                       />
                       <span className="font-medium">{permissionLabel(p)}</span>
-                      <span className="ml-auto font-mono text-xs text-muted-foreground">{p}</span>
+                      <span className="ml-auto font-mono text-xs text-muted-foreground">
+                        {p}
+                      </span>
                     </label>
                   ))}
                   <div className="sm:col-span-2 flex justify-end gap-2 pt-1">
@@ -376,7 +428,9 @@ export function UserManagementClient() {
         <Card>
           <CardHeader>
             <CardTitle>Users</CardTitle>
-            <CardDescription>Manage roles, permissions, and activation status.</CardDescription>
+            <CardDescription>
+              Manage roles, permissions, and activation status.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -391,7 +445,10 @@ export function UserManagementClient() {
               </div>
               <div className="w-full space-y-2 sm:w-56">
                 <Label>Role filter</Label>
-                <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as UserRole | "All")}>
+                <Select
+                  value={roleFilter}
+                  onValueChange={(v) => setRoleFilter(v as UserRole | "All")}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="All roles" />
                   </SelectTrigger>
@@ -417,7 +474,9 @@ export function UserManagementClient() {
               </div>
 
               {filteredUsers.length === 0 ? (
-                <div className="rounded-md border p-6 text-sm text-muted-foreground">No users found.</div>
+                <div className="rounded-md border p-6 text-sm text-muted-foreground">
+                  No users found.
+                </div>
               ) : null}
 
               {filteredUsers.map((u) => {
@@ -427,21 +486,34 @@ export function UserManagementClient() {
                     <div className="grid gap-3 p-3 md:grid-cols-[1.2fr_1fr_0.6fr_0.8fr_0.6fr] md:items-center">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <div className={cn("truncate text-sm font-medium", !u.active && "text-muted-foreground")}>
+                          <div
+                            className={cn(
+                              "truncate text-sm font-medium",
+                              !u.active && "text-muted-foreground",
+                            )}
+                          >
                             {u.name}
                           </div>
-                          <Badge variant={statusBadgeVariant(u.active)}>{u.active ? "Active" : "Inactive"}</Badge>
+                          <Badge variant={statusBadgeVariant(u.active)}>
+                            {u.active ? "Active" : "Inactive"}
+                          </Badge>
                         </div>
-                        <div className="truncate text-xs text-muted-foreground">{u.email}</div>
+                        <div className="truncate text-xs text-muted-foreground">
+                          {u.email}
+                        </div>
                       </div>
 
                       <div className="text-sm md:text-xs">
-                        <div className="md:hidden text-xs text-muted-foreground">Badge</div>
+                        <div className="md:hidden text-xs text-muted-foreground">
+                          Badge
+                        </div>
                         <div className="font-mono">{u.badgeNumber}</div>
                       </div>
 
                       <div className="space-y-1">
-                        <div className="md:hidden text-xs text-muted-foreground">Role</div>
+                        <div className="md:hidden text-xs text-muted-foreground">
+                          Role
+                        </div>
                         <Select
                           value={u.role}
                           onValueChange={(v) => {
@@ -449,7 +521,11 @@ export function UserManagementClient() {
                             updateUser(u.id, (prev) => ({
                               ...prev,
                               role,
-                              permissions: uniquePermissions(role === prev.role ? prev.permissions : ROLE_DEFAULTS[role]),
+                              permissions: uniquePermissions(
+                                role === prev.role
+                                  ? prev.permissions
+                                  : ROLE_DEFAULTS[role],
+                              ),
                             }));
                           }}
                         >
@@ -463,19 +539,29 @@ export function UserManagementClient() {
                           </SelectContent>
                         </Select>
                         <div className="hidden md:block">
-                          <Badge variant={roleBadgeVariant(u.role)}>{u.role}</Badge>
+                          <Badge variant={roleBadgeVariant(u.role)}>
+                            {u.role}
+                          </Badge>
                         </div>
                       </div>
 
                       <div className="text-sm md:text-xs">
-                        <div className="md:hidden text-xs text-muted-foreground">Permissions</div>
+                        <div className="md:hidden text-xs text-muted-foreground">
+                          Permissions
+                        </div>
                         <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline">{u.permissions.length} total</Badge>
+                          <Badge variant="outline">
+                            {u.permissions.length} total
+                          </Badge>
                           <Button
                             type="button"
                             variant="link"
                             className="h-auto p-0 text-xs"
-                            onClick={() => setExpandedUserId((cur) => (cur === u.id ? null : u.id))}
+                            onClick={() =>
+                              setExpandedUserId((cur) =>
+                                cur === u.id ? null : u.id,
+                              )
+                            }
                           >
                             {isExpanded ? "Hide" : "Edit"}
                           </Button>
@@ -487,7 +573,12 @@ export function UserManagementClient() {
                           type="button"
                           variant={u.active ? "destructive" : "secondary"}
                           className="w-full md:w-auto"
-                          onClick={() => updateUser(u.id, (prev) => ({ ...prev, active: !prev.active }))}
+                          onClick={() =>
+                            updateUser(u.id, (prev) => ({
+                              ...prev,
+                              active: !prev.active,
+                            }))
+                          }
                         >
                           {u.active ? "Deactivate" : "Activate"}
                         </Button>
@@ -498,17 +589,26 @@ export function UserManagementClient() {
                       <div className="border-t p-3">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
-                            <div className="text-sm font-medium">Permissions for {u.name}</div>
+                            <div className="text-sm font-medium">
+                              Permissions for {u.name}
+                            </div>
                             <div className="text-xs text-muted-foreground">
                               Role defaults:{" "}
-                              <span className="font-mono">{ROLE_DEFAULTS[u.role].join(", ")}</span>
+                              <span className="font-mono">
+                                {ROLE_DEFAULTS[u.role].join(", ")}
+                              </span>
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <Button
                               type="button"
                               variant="outline"
-                              onClick={() => updateUser(u.id, (prev) => ({ ...prev, permissions: ROLE_DEFAULTS[prev.role] }))}
+                              onClick={() =>
+                                updateUser(u.id, (prev) => ({
+                                  ...prev,
+                                  permissions: ROLE_DEFAULTS[prev.role],
+                                }))
+                              }
                             >
                               Reset to role defaults
                             </Button>
@@ -517,7 +617,10 @@ export function UserManagementClient() {
 
                         <div className="mt-3 grid gap-2 sm:grid-cols-2">
                           {ALL_PERMISSIONS.map((p) => (
-                            <label key={p} className="flex items-center gap-2 rounded-md border p-2 text-sm">
+                            <label
+                              key={p}
+                              className="flex items-center gap-2 rounded-md border p-2 text-sm"
+                            >
                               <input
                                 type="checkbox"
                                 className="h-4 w-4 accent-primary"
@@ -525,12 +628,18 @@ export function UserManagementClient() {
                                 onChange={() =>
                                   updateUser(u.id, (prev) => ({
                                     ...prev,
-                                    permissions: uniquePermissions(togglePermission(prev.permissions, p)),
+                                    permissions: uniquePermissions(
+                                      togglePermission(prev.permissions, p),
+                                    ),
                                   }))
                                 }
                               />
-                              <span className="font-medium">{permissionLabel(p)}</span>
-                              <span className="ml-auto font-mono text-xs text-muted-foreground">{p}</span>
+                              <span className="font-medium">
+                                {permissionLabel(p)}
+                              </span>
+                              <span className="ml-auto font-mono text-xs text-muted-foreground">
+                                {p}
+                              </span>
                             </label>
                           ))}
                         </div>
@@ -546,5 +655,3 @@ export function UserManagementClient() {
     </div>
   );
 }
-
-

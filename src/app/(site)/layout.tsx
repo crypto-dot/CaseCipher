@@ -12,5 +12,3 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     </>
   );
 }
-
-

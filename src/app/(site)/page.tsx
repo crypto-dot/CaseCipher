@@ -1,7 +1,13 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
@@ -23,8 +29,9 @@ export default function Home() {
                 CaseCipher keeps your team aligned on every case.
               </h1>
               <p className="max-w-xl text-pretty text-lg leading-7 text-muted-foreground">
-                Track status, ownership, and work-in-progress in one clean dashboard. Create cases in seconds, route
-                them to the right person, and keep a clear audit trail.
+                Track status, ownership, and work-in-progress in one clean
+                dashboard. Create cases in seconds, route them to the right
+                person, and keep a clear audit trail.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button asChild size="lg">
@@ -54,13 +61,19 @@ export default function Home() {
               <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/10 via-transparent to-transparent" />
               <CardHeader>
                 <CardTitle>Operational snapshot</CardTitle>
-                <CardDescription>A quick view of case status and who’s actively working.</CardDescription>
+                <CardDescription>
+                  A quick view of case status and who’s actively working.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-lg border bg-background/60 p-4">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">CASE-1002 · Evidence packet</div>
-                    <span className="text-xs text-muted-foreground">In progress</span>
+                    <div className="font-medium">
+                      CASE-1002 · Evidence packet
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      In progress
+                    </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
                     <span>Assignee: Sam</span>
@@ -69,8 +82,12 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg border bg-background/60 p-4">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">CASE-1003 · Signature mismatch</div>
-                    <span className="text-xs text-muted-foreground">Blocked</span>
+                    <div className="font-medium">
+                      CASE-1003 · Signature mismatch
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      Blocked
+                    </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
                     <span>Assignee: Jordan</span>
@@ -105,7 +122,8 @@ export default function Home() {
               Everything you need to run a case workflow
             </h2>
             <p className="max-w-2xl text-muted-foreground">
-              Designed for teams that need consistent intake, transparent ownership, and reliable status reporting.
+              Designed for teams that need consistent intake, transparent
+              ownership, and reliable status reporting.
             </p>
           </div>
 
@@ -113,16 +131,21 @@ export default function Home() {
             <Card>
               <CardHeader>
                 <CardTitle>Status you can trust</CardTitle>
-                <CardDescription>Standardized states and quick transitions.</CardDescription>
+                <CardDescription>
+                  Standardized states and quick transitions.
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                Keep your pipeline accurate with explicit status changes and consistent labels.
+                Keep your pipeline accurate with explicit status changes and
+                consistent labels.
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
                 <CardTitle>Clear ownership</CardTitle>
-                <CardDescription>Know who’s working on what—instantly.</CardDescription>
+                <CardDescription>
+                  Know who’s working on what—instantly.
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
                 Reassign in one click and keep work balanced across the team.
@@ -131,18 +154,25 @@ export default function Home() {
             <Card>
               <CardHeader>
                 <CardTitle>Validated intake</CardTitle>
-                <CardDescription>Forms with guardrails built in.</CardDescription>
+                <CardDescription>
+                  Forms with guardrails built in.
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                Built with React Hook Form + Zod so required fields stay required.
+                Built with React Hook Form + Zod so required fields stay
+                required.
               </CardContent>
             </Card>
           </div>
 
           <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border bg-card p-6 sm:flex-row sm:items-center">
             <div>
-              <div className="text-lg font-semibold tracking-tight">Ready to try it?</div>
-              <div className="text-sm text-muted-foreground">Jump into the dashboard to see the case workflow.</div>
+              <div className="text-lg font-semibold tracking-tight">
+                Ready to try it?
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Jump into the dashboard to see the case workflow.
+              </div>
             </div>
             <Button asChild>
               <Link href="/dashboard">Go to dashboard</Link>
@@ -153,5 +183,3 @@ export default function Home() {
     </div>
   );
 }
-
-

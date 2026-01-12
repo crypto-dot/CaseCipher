@@ -171,8 +171,16 @@
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto,
-    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    "Apple Color Emoji",
+    "Segoe UI Emoji";
 }
 
 * {
@@ -180,7 +188,6 @@ body {
 }
 
 .dark {
-
   --background: oklch(0.145 0 0);
 
   --foreground: oklch(0.985 0 0);

@@ -12,15 +12,46 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { casePrioritiesSchema, CasePriority, caseStatusesSchema, TeamMember, teamMembersSchema, type CaseAttachment, type CaseStatus } from "@/lib/case-types";
+import {
+  casePrioritiesSchema,
+  CasePriority,
+  caseStatusesSchema,
+  type CaseAttachment,
+  type CaseStatus,
+} from "@/lib/case-types";
+import { mockAssignees, getAssigneeFullName, type Assignee } from "@/lib/mocks";
 import { useCreateCase } from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +68,12 @@ function toAttachmentMeta(files: FileList | null): CaseAttachment[] {
 const newCaseSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   client: z.string().min(2, "Client must be at least 2 characters"),
-  description: z.string().max(2000, "Description must be 2000 characters or less").optional(),
+  description: z
+    .string()
+    .max(2000, "Description must be 2000 characters or less")
+    .optional(),
   status: caseStatusesSchema,
-  assignee: teamMembersSchema.optional(),
+  assignee: z.string().optional(),
   priority: casePrioritiesSchema,
   incidentDate: z.date().optional(),
   incidentTime: z
@@ -73,7 +107,10 @@ export default function NewCasePage() {
   });
 
   const files = form.watch("attachments") as FileList | undefined;
-  const fileMetas = React.useMemo(() => toAttachmentMeta(files ?? null), [files]);
+  const fileMetas = React.useMemo(
+    () => toAttachmentMeta(files ?? null),
+    [files],
+  );
 
   async function onSubmit(values: NewCaseTypes) {
     await createCaseMut.mutateAsync({
@@ -83,7 +120,9 @@ export default function NewCasePage() {
       status: values.status,
       assignee: values.assignee || "",
       priority: values.priority,
-      incidentDate: values.incidentDate ? format(values.incidentDate, "yyyy-MM-dd") : undefined,
+      incidentDate: values.incidentDate
+        ? format(values.incidentDate, "yyyy-MM-dd")
+        : undefined,
       incidentTime: values.incidentTime || undefined,
       attachments: fileMetas.length ? fileMetas : undefined,
     });
@@ -95,7 +134,9 @@ export default function NewCasePage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Create case</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Full intake details for a new case.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Full intake details for a new case.
+          </p>
         </div>
         <Button asChild variant="outline">
           <Link href="/dashboard">Back to dashboard</Link>
@@ -105,7 +146,10 @@ export default function NewCasePage() {
       <Card>
         <CardHeader>
           <CardTitle>Case details</CardTitle>
-          <CardDescription>Fill out the intake fields; attachments are stored as metadata locally.</CardDescription>
+          <CardDescription>
+            Fill out the intake fields; attachments are stored as metadata
+            locally.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -118,7 +162,10 @@ export default function NewCasePage() {
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Intake: slip-and-fall incident" {...field} />
+                        <Input
+                          placeholder="e.g. Intake: slip-and-fall incident"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,7 +179,10 @@ export default function NewCasePage() {
                     <FormItem>
                       <FormLabel>Client</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Northwind Logistics" {...field} />
+                        <Input
+                          placeholder="e.g. Northwind Logistics"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -147,9 +197,14 @@ export default function NewCasePage() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Context, next steps, key people involved…" {...field} />
+                      <Textarea
+                        placeholder="Context, next steps, key people involved…"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormDescription>Optional. Include anything that helps triage.</FormDescription>
+                    <FormDescription>
+                      Optional. Include anything that helps triage.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -162,14 +217,19 @@ export default function NewCasePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(Object.keys(caseStatusesSchema) as Array<CaseStatus>).map((s: CaseStatus) => (
+                          {(
+                            Object.keys(caseStatusesSchema) as Array<CaseStatus>
+                          ).map((s: CaseStatus) => (
                             <SelectItem key={s} value={s}>
                               {s.replace("_", " ")}
                             </SelectItem>
@@ -187,16 +247,19 @@ export default function NewCasePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assignee</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select assignee" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => (
-                            <SelectItem key={m} value={m}>
-                              {m}
+                          {mockAssignees.map((assignee: Assignee) => (
+                            <SelectItem key={assignee.id} value={assignee.id}>
+                              {getAssigneeFullName(assignee)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -212,14 +275,21 @@ export default function NewCasePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Priority</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select priority" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(Object.keys(casePrioritiesSchema) as Array<CasePriority>).map((p: CasePriority) => (
+                          {(
+                            Object.keys(
+                              casePrioritiesSchema,
+                            ) as Array<CasePriority>
+                          ).map((p: CasePriority) => (
                             <SelectItem key={p} value={p}>
                               {p}
                             </SelectItem>
@@ -253,7 +323,9 @@ export default function NewCasePage() {
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? format(field.value, "PPP") : "Pick a date"}
+                              {field.value
+                                ? format(field.value, "PPP")
+                                : "Pick a date"}
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
@@ -294,19 +366,31 @@ export default function NewCasePage() {
                   id="attachments"
                   type="file"
                   multiple
-                  onChange={(e) => form.setValue("attachments", e.target.files as FileList, { shouldValidate: true })}
+                  onChange={(e) =>
+                    form.setValue("attachments", e.target.files as FileList, {
+                      shouldValidate: true,
+                    })
+                  }
                 />
                 <div className="text-xs text-muted-foreground">
-                  Attach files to this case. (This demo stores file metadata locally.)
+                  Attach files to this case. (This demo stores file metadata
+                  locally.)
                 </div>
                 {fileMetas.length ? (
                   <div className="rounded-md border p-3">
-                    <div className="text-xs font-medium text-muted-foreground">Selected files</div>
+                    <div className="text-xs font-medium text-muted-foreground">
+                      Selected files
+                    </div>
                     <ul className="mt-2 space-y-1 text-sm">
                       {fileMetas.map((f) => (
-                        <li key={`${f.name}:${f.lastModified}`} className="flex items-center justify-between gap-3">
+                        <li
+                          key={`${f.name}:${f.lastModified}`}
+                          className="flex items-center justify-between gap-3"
+                        >
                           <span className="truncate">{f.name}</span>
-                          <span className="shrink-0 text-xs text-muted-foreground">{Math.ceil(f.size / 1024)} KB</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {Math.ceil(f.size / 1024)} KB
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -316,7 +400,11 @@ export default function NewCasePage() {
 
               <Separator />
 
-              <Button type="submit" className="w-fit" disabled={createCaseMut.isPending}>
+              <Button
+                type="submit"
+                className="w-fit"
+                disabled={createCaseMut.isPending}
+              >
                 {createCaseMut.isPending ? (
                   <>
                     <Loader2 className="animate-spin" />
@@ -333,5 +421,3 @@ export default function NewCasePage() {
     </div>
   );
 }
-
-

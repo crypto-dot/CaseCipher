@@ -6,11 +6,32 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { caseStatusesSchema, TeamMember, teamMembersSchema, type CaseItem, type CaseStatus } from "@/lib/case-types";
-import { useCases, useReassignCase, useUpdateCaseStatus } from "@/lib/case-hooks";
+import {
+  caseStatusesSchema,
+  type CaseItem,
+  type CaseStatus,
+} from "@/lib/case-types";
+import { mockAssignees, getAssigneeFullName, type Assignee } from "@/lib/mocks";
+import {
+  useCases,
+  useReassignCase,
+  useUpdateCaseStatus,
+} from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
 
 function statusBadgeVariant(status: CaseStatus) {
@@ -106,28 +127,36 @@ export function DashboardClient() {
             <CardTitle className="text-base">New</CardTitle>
             <CardDescription>Awaiting triage</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-semibold">{counts.new}</CardContent>
+          <CardContent className="text-3xl font-semibold">
+            {counts.new}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader>
             <CardTitle className="text-base">In progress</CardTitle>
             <CardDescription>Actively being worked</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-semibold">{counts.in_progress}</CardContent>
+          <CardContent className="text-3xl font-semibold">
+            {counts.in_progress}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Blocked</CardTitle>
             <CardDescription>Needs input or dependency</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-semibold">{counts.blocked}</CardContent>
+          <CardContent className="text-3xl font-semibold">
+            {counts.blocked}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Resolved</CardTitle>
             <CardDescription>Completed work</CardDescription>
           </CardHeader>
-          <CardContent className="text-3xl font-semibold">{counts.resolved}</CardContent>
+          <CardContent className="text-3xl font-semibold">
+            {counts.resolved}
+          </CardContent>
         </Card>
       </div>
 
@@ -135,12 +164,17 @@ export function DashboardClient() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-            <CardTitle>Cases</CardTitle>
-            <Button asChild className="w-fit relative top-[10px] border-2 border-primary">
+              <CardTitle>Cases</CardTitle>
+              <Button
+                asChild
+                className="w-fit relative top-[10px] border-2 border-primary"
+              >
                 <Link href="/dashboard/cases/new">Create a new case</Link>
               </Button>
             </div>
-            <CardDescription>Status, ownership, and quick updates.</CardDescription>
+            <CardDescription>
+              Status, ownership, and quick updates.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {casesQuery.isLoading ? (
@@ -153,24 +187,36 @@ export function DashboardClient() {
                 Failed to load cases. Try refreshing.
               </div>
             ) : cases.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No cases yet—create your first one.</div>
+              <div className="text-sm text-muted-foreground">
+                No cases yet—create your first one.
+              </div>
             ) : (
               <div className="divide-y rounded-lg border">
                 {cases.map((c) => (
-                  <div key={c.id} className="grid gap-3 p-4 md:grid-cols-[1.2fr_0.8fr_0.8fr] md:items-center">
+                  <div
+                    key={c.id}
+                    className="grid gap-3 p-4 md:grid-cols-[1.2fr_0.8fr_0.8fr] md:items-center"
+                  >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">{c.id}</span>
-                        <Badge variant={statusBadgeVariant(c.status)}>{statusLabel(c.status)}</Badge>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {c.id}
+                        </span>
+                        <Badge variant={statusBadgeVariant(c.status)}>
+                          {statusLabel(c.status)}
+                        </Badge>
                       </div>
                       <div className="mt-1 truncate font-medium">{c.title}</div>
                       <div className="mt-1 text-sm text-muted-foreground">
-                        Client: <span className="text-foreground/90">{c.client}</span>
+                        Client:{" "}
+                        <span className="text-foreground/90">{c.client}</span>
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <div className="text-xs font-medium text-muted-foreground">Assignee</div>
+                      <div className="text-xs font-medium text-muted-foreground">
+                        Assignee
+                      </div>
                       <Select
                         value={c.assignee}
                         onValueChange={(assignee) =>
@@ -182,9 +228,9 @@ export function DashboardClient() {
                           <SelectValue placeholder="Select assignee" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => (
-                            <SelectItem key={m} value={m}>
-                              {m.replace("_", " ")}
+                          {mockAssignees.map((assignee: Assignee) => (
+                            <SelectItem key={assignee.id} value={assignee.id}>
+                              {getAssigneeFullName(assignee)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -192,11 +238,16 @@ export function DashboardClient() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <div className="text-xs font-medium text-muted-foreground">Status</div>
+                      <div className="text-xs font-medium text-muted-foreground">
+                        Status
+                      </div>
                       <Select
                         value={c.status}
                         onValueChange={(status) =>
-                          updateStatusMut.mutate({ id: c.id, status: status as CaseStatus })
+                          updateStatusMut.mutate({
+                            id: c.id,
+                            status: status as CaseStatus,
+                          })
                         }
                         disabled={updateStatusMut.isPending}
                       >
@@ -204,7 +255,9 @@ export function DashboardClient() {
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(Object.keys(caseStatusesSchema) as Array<CaseStatus>).map((s: CaseStatus) => (
+                          {(
+                            Object.keys(caseStatusesSchema) as Array<CaseStatus>
+                          ).map((s: CaseStatus) => (
                             <SelectItem key={s} value={s}>
                               {statusLabel(s)}
                             </SelectItem>
@@ -217,7 +270,12 @@ export function DashboardClient() {
               </div>
             )}
 
-            <div className={cn("text-xs text-muted-foreground", cases.length ? "" : "hidden")}>
+            <div
+              className={cn(
+                "text-xs text-muted-foreground",
+                cases.length ? "" : "hidden",
+              )}
+            >
               Tip: changes are saved to localStorage so they persist on refresh.
             </div>
           </CardContent>
@@ -229,12 +287,19 @@ export function DashboardClient() {
               <CardTitle>Workload by assignee</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {(Object.keys(teamMembersSchema) as Array<TeamMember>).map((m: TeamMember) => {
-                const list = byAssignee.get(m) ?? [];
-                const active = list.filter((c) => c.status !== "resolved").length;
+              {mockAssignees.map((assignee: Assignee) => {
+                const list = byAssignee.get(assignee.id) ?? [];
+                const active = list.filter(
+                  (c) => c.status !== "resolved",
+                ).length;
                 return (
-                  <div key={m} className="flex items-center justify-between">
-                    <div className="text-sm font-medium">{m}</div>
+                  <div
+                    key={assignee.id}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="text-sm font-medium">
+                      {getAssigneeFullName(assignee)}
+                    </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">
                         {active} active / {list.length} total
@@ -261,5 +326,3 @@ export function DashboardClient() {
     </div>
   );
 }
-
-

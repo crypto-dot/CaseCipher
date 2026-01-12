@@ -32,7 +32,9 @@ export default function RootLayout({
       >
         <ThemeScript />
         <Providers>
-          <div className="min-h-dvh bg-background text-foreground">{children}</div>
+          <div className="min-h-dvh bg-background text-foreground">
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

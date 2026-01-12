@@ -3,5 +3,3 @@ import { UserManagementClient } from "@/components/dashboard/user-management-cli
 export default function UserManagementPage() {
   return <UserManagementClient />;
 }
-
-

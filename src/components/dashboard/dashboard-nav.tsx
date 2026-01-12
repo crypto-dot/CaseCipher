@@ -4,7 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -23,14 +29,17 @@ export function DashboardNav() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const active = navItems.find((i) => isActive(pathname, i.href)) ?? navItems[0];
+  const active =
+    navItems.find((i) => isActive(pathname, i.href)) ?? navItems[0];
 
   return (
     <aside className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-sm font-medium">Dashboard</div>
-          <div className="text-xs text-muted-foreground">CaseCipher workspace</div>
+          <div className="text-xs text-muted-foreground">
+            CaseCipher workspace
+          </div>
         </div>
         <Badge variant="outline" className="hidden md:inline-flex">
           Menu
@@ -76,11 +85,10 @@ export function DashboardNav() {
         </nav>
         <Separator className="my-4" />
         <div className="text-xs text-muted-foreground">
-          Tip: use <span className="font-mono">New case</span> for full intake details.
+          Tip: use <span className="font-mono">New case</span> for full intake
+          details.
         </div>
       </div>
     </aside>
   );
 }
-
-

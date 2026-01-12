@@ -1,5 +1,11 @@
-import { type CaseAttachment, type CaseItem, type CasePriority, type CaseStatus, type TeamMember, teamMembersSchema } from "@/lib/case-types";
-import {z} from "zod";
+import {
+  caseStatusesSchema,
+  type CaseAttachment,
+  type CaseItem,
+  type CasePriority,
+  type CaseStatus,
+} from "@/lib/case-types";
+import { assigneeIdSchema } from "@/lib/mocks";
 const STORAGE_KEY = "casecipher:cases:v1";
 
 function nowIso() {
@@ -24,7 +30,7 @@ function seedCases(): CaseItem[] {
       client: "Northwind Logistics",
       description: "Collect signed authorization and verify incident date.",
       status: "new",
-      assignee: "Alex",
+      assignee: "1", // Alex Chen
       createdAt: t,
       updatedAt: t,
     },
@@ -34,7 +40,7 @@ function seedCases(): CaseItem[] {
       client: "Contoso Health",
       description: "Confirm chain-of-custody and mark sensitive attachments.",
       status: "in_progress",
-      assignee: "Sam",
+      assignee: "3", // Sam Rivera
       createdAt: t,
       updatedAt: t,
     },
@@ -44,7 +50,7 @@ function seedCases(): CaseItem[] {
       client: "Fabrikam Legal",
       description: "Escalate to client rep and request re-sign within 48h.",
       status: "blocked",
-      assignee: "Jordan",
+      assignee: "2", // Jordan Williams
       createdAt: t,
       updatedAt: t,
     },
@@ -54,7 +60,7 @@ function seedCases(): CaseItem[] {
       client: "Globex Corp",
       description: "Export report PDF and notify stakeholders.",
       status: "resolved",
-      assignee: "Taylor",
+      assignee: "4", // Taylor Morgan
       createdAt: t,
       updatedAt: t,
     },
@@ -79,7 +85,9 @@ function writeAll(items: CaseItem[]) {
 export async function listCases(): Promise<CaseItem[]> {
   // Simulate network latency for React Query UX.
   await new Promise((r) => setTimeout(r, 150));
-  return readAll().slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return readAll()
+    .slice()
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export type CreateCaseInput = {
@@ -126,15 +134,17 @@ export async function createCase(input: CreateCaseInput): Promise<CaseItem> {
 
 export async function updateCaseStatus(params: {
   id: string;
-  status: CaseStatus;
+  status: string;
 }): Promise<CaseItem> {
   await new Promise((r) => setTimeout(r, 200));
   const items = readAll();
   const idx = items.findIndex((c) => c.id === params.id);
   if (idx < 0) throw new Error("Case not found");
+  const parsed = caseStatusesSchema.safeParse(params.status);
+  const status = parsed.success ? parsed.data : items[idx].status;
   const updated: CaseItem = {
     ...items[idx],
-    status: params.status,
+    status,
     updatedAt: nowIso(),
   };
   const next = items.slice();
@@ -151,9 +161,8 @@ export async function reassignCase(params: {
   const items = readAll();
   const idx = items.findIndex((c) => c.id === params.id);
   if (idx < 0) throw new Error("Case not found");
-  const assignee = teamMembersSchema.safeParse(params.assignee).success
-    ? params.assignee
-    : items[idx].assignee;
+  const parsed = assigneeIdSchema.safeParse(params.assignee);
+  const assignee = parsed.success ? parsed.data : items[idx].assignee;
   const updated: CaseItem = {
     ...items[idx],
     assignee,
@@ -164,5 +173,3 @@ export async function reassignCase(params: {
   writeAll(next);
   return updated;
 }
-
-

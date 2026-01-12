@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-export const caseStatusesSchema = z.enum(["new", "in_progress", "blocked", "resolved"]);
+export const caseStatusesSchema = z.enum([
+  "new",
+  "in_progress",
+  "blocked",
+  "resolved",
+]);
 export type CaseStatus = z.infer<typeof caseStatusesSchema>;
 
 export const casePrioritiesSchema = z.enum(["low", "medium", "high"]);
@@ -27,12 +32,6 @@ export const caseItemSchema = z.object({
   attachments: caseAttachmentsSchema.array().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
-}); 
+});
 
 export type CaseItem = z.infer<typeof caseItemSchema>;
-
-
-export const teamMembersSchema = z.enum(["Alex", "Jordan", "Sam", "Taylor"]);
-export type TeamMember = z.infer<typeof teamMembersSchema>;
-
-
