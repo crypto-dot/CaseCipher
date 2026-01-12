@@ -33,7 +33,7 @@ import {
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
 import { cn } from "@/lib/utils";
-
+import { useUser } from "@stackframe/stack";
 function statusBadgeVariant(status: CaseStatus) {
   switch (status) {
     case "resolved":
@@ -72,6 +72,7 @@ function groupByAssignee(cases: CaseItem[]) {
 }
 
 export function DashboardClient() {
+  useUser({ or: 'redirect' });
   const casesQuery = useCases();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
@@ -255,9 +256,7 @@ export function DashboardClient() {
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(
-                            Object.keys(caseStatusesSchema) as Array<CaseStatus>
-                          ).map((s: CaseStatus) => (
+                          {caseStatusesSchema.options.map((s) => (
                             <SelectItem key={s} value={s}>
                               {statusLabel(s)}
                             </SelectItem>

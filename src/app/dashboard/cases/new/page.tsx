@@ -227,9 +227,7 @@ export default function NewCasePage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(
-                            Object.keys(caseStatusesSchema) as Array<CaseStatus>
-                          ).map((s: CaseStatus) => (
+                          {caseStatusesSchema.options.map((s) => (
                             <SelectItem key={s} value={s}>
                               {s.replace("_", " ")}
                             </SelectItem>

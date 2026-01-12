@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/utils";
+import { stackServerApp } from "@/stack/server";
 
-export function SiteHeader({ className }: { className?: string }) {
+export async function SiteHeader({ className }: { className?: string }) {
+  const user = await stackServerApp.getUser();
   return (
     <header
       className={cn(
@@ -28,12 +30,25 @@ export function SiteHeader({ className }: { className?: string }) {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
-            <Link href="/about">Learn more</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/dashboard">Open dashboard</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/handler/signout">Sign out</Link>
+              </Button>
+              <Button asChild size="lg">
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/handler/signin">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/handler/signup">Sign up</Link>
+              </Button>
+            </>
+          )}
           <ThemeToggle />
         </div>
       </nav>
