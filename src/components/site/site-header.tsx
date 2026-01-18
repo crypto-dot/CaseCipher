@@ -1,12 +1,23 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { stackServerApp } from "@/stack/server";
+import { authClient } from "@/lib/auth";
 
-export async function SiteHeader({ className }: { className?: string }) {
-  const user = await stackServerApp.getUser();
+export function SiteHeader({ className }: { className?: string }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      setIsAuthenticated(!!data?.user);
+      setIsLoading(false);
+    });
+  }, []);
+
   return (
     <header
       className={cn(
@@ -30,10 +41,13 @@ export async function SiteHeader({ className }: { className?: string }) {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          {user ? (
+          {isLoading ? (
+            // Show placeholder while checking auth
+            <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
+          ) : isAuthenticated ? (
             <>
               <Button asChild size="lg" variant="outline">
-                <Link href="/handler/signout">Sign out</Link>
+                <Link href="/auth/sign-out">Sign out</Link>
               </Button>
               <Button asChild size="lg">
                 <Link href="/dashboard">Dashboard</Link>
@@ -42,10 +56,10 @@ export async function SiteHeader({ className }: { className?: string }) {
           ) : (
             <>
               <Button asChild size="lg" variant="outline">
-                <Link href="/handler/signin">Sign in</Link>
+                <Link href="/auth/sign-in">Sign in</Link>
               </Button>
               <Button asChild>
-                <Link href="/handler/signup">Sign up</Link>
+                <Link href="/auth/sign-up">Sign up</Link>
               </Button>
             </>
           )}

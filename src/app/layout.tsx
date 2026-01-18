@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { StackProvider, StackTheme } from "@stackframe/stack";
-import { stackClientApp } from "../stack/client";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/app/providers";
@@ -31,14 +29,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      ><StackProvider app={stackClientApp}><StackTheme>
+      >
         <ThemeScript />
         <Providers>
           <div className="min-h-dvh bg-background text-foreground">
             {children}
           </div>
         </Providers>
-      </StackTheme></StackProvider></body>
+      </body>
     </html>
   );
 }

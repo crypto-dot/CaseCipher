@@ -95,7 +95,6 @@ function roleBadgeVariant(role: UserRole) {
       return "destructive" as const;
     case "Analyst":
       return "secondary" as const;
-    case "Examiner":
     default:
       return "outline" as const;
   }

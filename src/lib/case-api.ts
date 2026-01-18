@@ -1,11 +1,12 @@
 import {
-  caseStatusesSchema,
   type CaseAttachment,
   type CaseItem,
   type CasePriority,
   type CaseStatus,
+  caseStatusesSchema,
 } from "@/lib/case-types";
 import { assigneeIdSchema } from "@/lib/mocks";
+
 const STORAGE_KEY = "casecipher:cases:v1";
 
 function nowIso() {

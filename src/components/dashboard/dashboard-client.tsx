@@ -1,9 +1,9 @@
 "use client";
 
-import * as React from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
+import * as React from "react";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,20 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import {
-  caseStatusesSchema,
-  type CaseItem,
-  type CaseStatus,
-} from "@/lib/case-types";
-import { mockAssignees, getAssigneeFullName, type Assignee } from "@/lib/mocks";
 import {
   useCases,
   useReassignCase,
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
+import {
+  type CaseItem,
+  type CaseStatus,
+  caseStatusesSchema,
+} from "@/lib/case-types";
+import { type Assignee, getAssigneeFullName, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
-import { useUser } from "@stackframe/stack";
+
 function statusBadgeVariant(status: CaseStatus) {
   switch (status) {
     case "resolved":
@@ -42,7 +41,6 @@ function statusBadgeVariant(status: CaseStatus) {
       return "destructive";
     case "in_progress":
       return "warning";
-    case "new":
     default:
       return "outline";
   }
@@ -72,7 +70,6 @@ function groupByAssignee(cases: CaseItem[]) {
 }
 
 export function DashboardClient() {
-  useUser({ or: 'redirect' });
   const casesQuery = useCases();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();

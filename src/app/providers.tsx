@@ -1,7 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type * as React from "react";
+import { AuthProvider } from "@/components/auth";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -26,6 +27,8 @@ function getQueryClient() {
 export function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>{children}</AuthProvider>
+    </QueryClientProvider>
   );
 }

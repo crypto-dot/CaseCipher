@@ -2,12 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+// Use the localStorage-based API for now until database is configured
+// Once DATABASE_URL is set, these can be switched to use server actions
 import {
+  type CreateCaseInput,
   createCase,
   listCases,
   reassignCase,
   updateCaseStatus,
-  type CreateCaseInput,
 } from "@/lib/case-api";
 
 const keys = {

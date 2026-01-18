@@ -1,12 +1,11 @@
 "use client";
 
-import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Loader2 } from "lucide-react";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -44,15 +43,14 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  casePrioritiesSchema,
-  CasePriority,
-  caseStatusesSchema,
-  type CaseAttachment,
-  type CaseStatus,
-} from "@/lib/case-types";
-import { mockAssignees, getAssigneeFullName, type Assignee } from "@/lib/mocks";
 import { useCreateCase } from "@/lib/case-hooks";
+import {
+  type CaseAttachment,
+  type CasePriority,
+  casePrioritiesSchema,
+  caseStatusesSchema,
+} from "@/lib/case-types";
+import { type Assignee, getAssigneeFullName, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
 
 function toAttachmentMeta(files: FileList | null): CaseAttachment[] {

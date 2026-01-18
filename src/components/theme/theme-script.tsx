@@ -15,5 +15,6 @@ export function ThemeScript() {
 })();
 `.trim();
 
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: Intentional for inline theme detection to prevent flash
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
 }
