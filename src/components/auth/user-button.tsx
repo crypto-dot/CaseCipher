@@ -23,7 +23,7 @@ export function UserButton() {
     const checkSession = async () => {
       try {
         // Import auth client dynamically to avoid build errors
-        const { authClient } = await import("@/lib/auth");
+        const { authClient } = await import("@/lib/auth/client");
         const sessionAtom = authClient.useSession;
 
         // Try to get session state
@@ -55,7 +55,7 @@ export function UserButton() {
 
   const handleSignOut = async () => {
     try {
-      const { authClient } = await import("@/lib/auth");
+      const { authClient } = await import("@/lib/auth/client");
       await authClient.signOut();
       setSession(null);
     } catch {

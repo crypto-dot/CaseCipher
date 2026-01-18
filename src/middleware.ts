@@ -4,43 +4,21 @@ import { NextResponse } from "next/server";
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = [
   "/auth/sign-in",
-  "/auth/sign-up",
-  "/auth/forgot-password",
-  "/auth/reset-password",
+  "/auth/sign-up"
 ];
 // Note: /auth/verify-email is handled client-side - verified users are redirected,
 // unverified users can access to complete verification
-
-/**
- * Check if user has any auth session cookie.
- * Neon Auth (via Better Auth) may use different cookie names depending on configuration.
- */
 function hasAuthSession(request: NextRequest): boolean {
   const cookies = request.cookies;
-  
-  // Check common Better Auth / Neon Auth cookie patterns
-  
-    if (cookies.get("__Secure-neon-auth.session_token")?.value) {
-      return true;
-    }
-
-  
-  // Also check for any cookie containing "session" or "auth"
-  for (const cookie of cookies.getAll()) {
-    if (
-      cookie.name.toLowerCase().includes("session") ||
-      cookie.name.toLowerCase().includes("auth")
-    ) {
-      return true;
-    }
-  }
-  
-  return false;
+  const stackRefreshCookie = Array.from(cookies.getAll()).find(cookie => 
+    cookie.name.startsWith("stack-refresh")
+  );
+  return !!stackRefreshCookie;
 }
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAuthenticated = hasAuthSession(request);
+  const isAuthenticated = false;
 
   // Redirect authenticated users away from auth pages
   if (

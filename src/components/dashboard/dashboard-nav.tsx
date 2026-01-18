@@ -45,10 +45,10 @@ export function DashboardNav() {
   React.useEffect(() => {
     const checkSession = async () => {
       try {
-        const { authClient } = await import("@/lib/auth");
+        const { authClient } = await import("@/lib/auth/client");
         const sessionAtom = authClient.useSession;
-        if (sessionAtom && typeof sessionAtom.get === "function") {
-          const state = sessionAtom.get();
+        if (sessionAtom && typeof sessionAtom === "function") {
+          const state = sessionAtom();
           setSession(state?.data ?? null);
         }
       } catch {
@@ -145,7 +145,7 @@ export function DashboardNav() {
               className="w-full"
               onClick={async () => {
                 try {
-                  const { authClient } = await import("@/lib/auth");
+                  const { authClient } = await import("@/lib/auth/client");
                   await authClient.signOut();
                   setSession(null);
                 } catch {

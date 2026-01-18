@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/lib/auth";
+import { authClient } from "@/lib/auth/client";
 
 export function SiteHeader({ className }: { className?: string }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

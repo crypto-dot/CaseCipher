@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
+@import "@neondatabase/auth/ui/tailwind";
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -260,6 +260,6 @@ body {
   }
 }
 
-input[type="password"][autocomplete="new-password"] {
-  padding-left: 2rem;
+button {
+  cursor: pointer;
 }
