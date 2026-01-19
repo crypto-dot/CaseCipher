@@ -1,208 +1,253 @@
-import { relations } from "drizzle-orm";
-import {
-  boolean,
-  date,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  time,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, pgSchema, index, foreignKey, uuid, text, timestamp, unique, boolean, uniqueIndex, jsonb, date, time, integer, pgEnum } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 
-// ============================================================================
-// Enums
-// ============================================================================
+const neonAuth = pgSchema("neon_auth");
+export const casePriority = pgEnum("case_priority", ['low', 'medium', 'high'])
+export const caseStatus = pgEnum("case_status", ['new', 'in_progress', 'blocked', 'resolved'])
+export const userRole = pgEnum("user_role", ['admin', 'manager', 'analyst', 'examiner'])
 
-export const userRoleEnum = pgEnum("user_role", [
-  "admin",
-  "manager",
-  "analyst",
-  "examiner",
+
+ const invitationInNeonAuth = neonAuth.table("invitation", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	organizationId: uuid().notNull(),
+	email: text().notNull(),
+	role: text(),
+	status: text().notNull(),
+	expiresAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	inviterId: uuid().notNull(),
+}, (table) => [
+	index("invitation_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("invitation_organizationId_idx").using("btree", table.organizationId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.organizationId],
+			foreignColumns: [organizationInNeonAuth.id],
+			name: "invitation_organizationId_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.inviterId],
+			foreignColumns: [userInNeonAuth.id],
+			name: "invitation_inviterId_fkey"
+		}).onDelete("cascade"),
 ]);
 
-export const caseStatusEnum = pgEnum("case_status", [
-  "new",
-  "in_progress",
-  "blocked",
-  "resolved",
+const userInNeonAuth = neonAuth.table("user", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	name: text().notNull(),
+	email: text().notNull(),
+	emailVerified: boolean().notNull(),
+	image: text(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	role: text(),
+	banned: boolean(),
+	banReason: text(),
+	banExpires: timestamp({ withTimezone: true, mode: 'string' }),
+}, (table) => [
+	unique("user_email_key").on(table.email),
 ]);
 
-export const casePriorityEnum = pgEnum("case_priority", [
-  "low",
-  "medium",
-  "high",
+const sessionInNeonAuth = neonAuth.table("session", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	expiresAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	token: text().notNull(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	ipAddress: text(),
+	userAgent: text(),
+	userId: uuid().notNull(),
+	impersonatedBy: text(),
+	activeOrganizationId: text(),
+}, (table) => [
+	index("session_userId_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [userInNeonAuth.id],
+			name: "session_userId_fkey"
+		}).onDelete("cascade"),
+	unique("session_token_key").on(table.token),
 ]);
 
-// ============================================================================
-// User Profiles (extends neon_auth.users)
-// ============================================================================
+const organizationInNeonAuth = neonAuth.table("organization", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	name: text().notNull(),
+	slug: text().notNull(),
+	logo: text(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	metadata: text(),
+}, (table) => [
+	uniqueIndex("organization_slug_uidx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
+	unique("organization_slug_key").on(table.slug),
+]);
+
+const accountInNeonAuth = neonAuth.table("account", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	accountId: text().notNull(),
+	providerId: text().notNull(),
+	userId: uuid().notNull(),
+	accessToken: text(),
+	refreshToken: text(),
+	idToken: text(),
+	accessTokenExpiresAt: timestamp({ withTimezone: true, mode: 'string' }),
+	refreshTokenExpiresAt: timestamp({ withTimezone: true, mode: 'string' }),
+	scope: text(),
+	password: text(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	index("account_userId_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [userInNeonAuth.id],
+			name: "account_userId_fkey"
+		}).onDelete("cascade"),
+]);
+
+const verificationInNeonAuth = neonAuth.table("verification", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	identifier: text().notNull(),
+	value: text().notNull(),
+	expiresAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	index("verification_identifier_idx").using("btree", table.identifier.asc().nullsLast().op("text_ops")),
+]);
+
+const jwksInNeonAuth = neonAuth.table("jwks", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	publicKey: text().notNull(),
+	privateKey: text().notNull(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	expiresAt: timestamp({ withTimezone: true, mode: 'string' }),
+});
+
+const memberInNeonAuth = neonAuth.table("member", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	organizationId: uuid().notNull(),
+	userId: uuid().notNull(),
+	role: text().notNull(),
+	createdAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	index("member_organizationId_idx").using("btree", table.organizationId.asc().nullsLast().op("uuid_ops")),
+	index("member_userId_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.organizationId],
+			foreignColumns: [organizationInNeonAuth.id],
+			name: "member_organizationId_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [userInNeonAuth.id],
+			name: "member_userId_fkey"
+		}).onDelete("cascade"),
+]);
+
+const projectConfigInNeonAuth = neonAuth.table("project_config", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	name: text().notNull(),
+	endpointId: text("endpoint_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	trustedOrigins: jsonb("trusted_origins").notNull(),
+	socialProviders: jsonb("social_providers").notNull(),
+	emailProvider: jsonb("email_provider"),
+	emailAndPassword: jsonb("email_and_password"),
+	allowLocalhost: boolean("allow_localhost").notNull(),
+}, (table) => [
+	unique("project_config_endpoint_id_key").on(table.endpointId),
+]);
+
+const auditLog = pgTable("audit_log", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	userId: text("user_id").notNull(),
+	userEmail: text("user_email").notNull(),
+	userName: text("user_name"),
+	action: text().notNull(),
+	entityType: text("entity_type").notNull(),
+	entityId: uuid("entity_id"),
+	changes: jsonb(),
+	ipAddress: text("ip_address"),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+});
 
 export const userProfiles = pgTable("user_profiles", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull().unique(), // References neon_auth.users.id
-  badgeNumber: text("badge_number").unique(),
-  role: userRoleEnum("role").notNull().default("examiner"),
-  active: boolean("active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
-
-// ============================================================================
-// Clients
-// ============================================================================
-
-export const clients = pgTable("clients", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  contactEmail: text("contact_email"),
-  contactPhone: text("contact_phone"),
-  address: text("address"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
-
-// ============================================================================
-// Cases
-// ============================================================================
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	userId: uuid("user_id").references(() => userInNeonAuth.id, { onDelete: "cascade" }),
+	badgeNumber: text("badge_number"),
+	role: userRole().default('examiner').notNull(),
+	active: boolean().default(true).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	unique("user_profiles_user_id_unique").on(table.userId),
+	unique("user_profiles_badge_number_unique").on(table.badgeNumber),
+]);
 
 export const cases = pgTable("cases", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  caseNumber: text("case_number").unique(), // Generated by application
-  title: text("title").notNull(),
-  clientId: uuid("client_id").references(() => clients.id, {
-    onDelete: "set null",
-  }),
-  description: text("description"),
-  status: caseStatusEnum("status").notNull().default("new"),
-  priority: casePriorityEnum("priority").default("medium"),
-  incidentDate: date("incident_date"),
-  incidentTime: time("incident_time"),
-  assignedTo: text("assigned_to"), // References neon_auth.users.id
-  createdBy: text("created_by").notNull(), // References neon_auth.users.id
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
-
-// ============================================================================
-// Evidence
-// ============================================================================
-
-export const evidence = pgTable("evidence", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  caseId: uuid("case_id")
-    .notNull()
-    .references(() => cases.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  description: text("description"),
-  fileUrl: text("file_url"),
-  fileType: text("file_type"),
-  fileSize: integer("file_size"),
-  chainOfCustody: text("chain_of_custody"),
-  uploadedBy: text("uploaded_by").notNull(), // References neon_auth.users.id
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// ============================================================================
-// Case Notes
-// ============================================================================
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	caseNumber: text("case_number"),
+	title: text().notNull(),
+	clientId: uuid("client_id"),
+	description: text(),
+	status: caseStatus().default('new').notNull(),
+	priority: casePriority().default('medium'),
+	incidentDate: date("incident_date"),
+	incidentTime: time("incident_time"),
+	assignedTo: text("assigned_to"),
+	createdBy: text("created_by").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.clientId],
+			foreignColumns: [clients.id],
+			name: "cases_client_id_clients_id_fk"
+		}).onDelete("set null"),
+	unique("cases_case_number_unique").on(table.caseNumber),
+]);
 
 export const caseNotes = pgTable("case_notes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  caseId: uuid("case_id")
-    .notNull()
-    .references(() => cases.id, { onDelete: "cascade" }),
-  content: text("content").notNull(),
-  authorId: text("author_id").notNull(), // References neon_auth.users.id
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	caseId: uuid("case_id").notNull(),
+	content: text().notNull(),
+	authorId: text("author_id").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.caseId],
+			foreignColumns: [cases.id],
+			name: "case_notes_case_id_cases_id_fk"
+		}).onDelete("cascade"),
+]);
+
+export const clients = pgTable("clients", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	name: text().notNull(),
+	contactEmail: text("contact_email"),
+	contactPhone: text("contact_phone"),
+	address: text(),
+	notes: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
 });
 
-// ============================================================================
-// Audit Log
-// ============================================================================
-
-export const auditLog = pgTable("audit_log", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(), // References neon_auth.users.id
-  userEmail: text("user_email").notNull(), // Denormalized for historical record
-  userName: text("user_name"), // Denormalized for historical record
-  action: text("action").notNull(), // e.g., "case.created", "evidence.uploaded"
-  entityType: text("entity_type").notNull(), // e.g., "case", "evidence", "client"
-  entityId: uuid("entity_id"),
-  changes: jsonb("changes"), // { before: {...}, after: {...} }
-  ipAddress: text("ip_address"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// ============================================================================
-// Relations
-// ============================================================================
-
-export const clientsRelations = relations(clients, ({ many }) => ({
-  cases: many(cases),
-}));
-
-export const casesRelations = relations(cases, ({ one, many }) => ({
-  client: one(clients, {
-    fields: [cases.clientId],
-    references: [clients.id],
-  }),
-  evidence: many(evidence),
-  notes: many(caseNotes),
-}));
-
-export const evidenceRelations = relations(evidence, ({ one }) => ({
-  case: one(cases, {
-    fields: [evidence.caseId],
-    references: [cases.id],
-  }),
-}));
-
-export const caseNotesRelations = relations(caseNotes, ({ one }) => ({
-  case: one(cases, {
-    fields: [caseNotes.caseId],
-    references: [cases.id],
-  }),
-}));
-
-// ============================================================================
-// Types
-// ============================================================================
-
-export type UserProfile = typeof userProfiles.$inferSelect;
-export type NewUserProfile = typeof userProfiles.$inferInsert;
-
-export type Client = typeof clients.$inferSelect;
-export type NewClient = typeof clients.$inferInsert;
-
-export type Case = typeof cases.$inferSelect;
-export type NewCase = typeof cases.$inferInsert;
-
-export type Evidence = typeof evidence.$inferSelect;
-export type NewEvidence = typeof evidence.$inferInsert;
-
-export type CaseNote = typeof caseNotes.$inferSelect;
-export type NewCaseNote = typeof caseNotes.$inferInsert;
-
-export type AuditLogEntry = typeof auditLog.$inferSelect;
-export type NewAuditLogEntry = typeof auditLog.$inferInsert;
-
-export type UserRole = "admin" | "manager" | "analyst" | "examiner";
-export type CaseStatus = "new" | "in_progress" | "blocked" | "resolved";
-export type CasePriority = "low" | "medium" | "high";
+export const evidence = pgTable("evidence", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	caseId: uuid("case_id").notNull(),
+	name: text().notNull(),
+	description: text(),
+	fileUrl: text("file_url"),
+	fileType: text("file_type"),
+	fileSize: integer("file_size"),
+	chainOfCustody: text("chain_of_custody"),
+	uploadedBy: text("uploaded_by").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.caseId],
+			foreignColumns: [cases.id],
+			name: "evidence_case_id_cases_id_fk"
+		}).onDelete("cascade"),
+]);
