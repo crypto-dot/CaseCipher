@@ -1,11 +1,21 @@
 "use client";
 
-import { LogOut, User } from "lucide-react";
+import {
+  Activity,
+  Database,
+  FolderOpen,
+  LayoutDashboard,
+  Link2,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -15,18 +25,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Overview" },
-  { href: "/dashboard/cases/new", label: "New case" },
-  { href: "/dashboard/users", label: "User management" },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    match: (pathname: string) => pathname === "/dashboard",
+  },
+  {
+    href: "/dashboard/cases",
+    label: "Cases",
+    icon: FolderOpen,
+    match: (pathname: string) =>
+      pathname === "/dashboard/cases" ||
+      pathname.startsWith("/dashboard/cases/"),
+  },
+  {
+    href: "/dashboard/evidence",
+    label: "Evidence",
+    icon: Database,
+    match: (pathname: string) => pathname.startsWith("/dashboard/evidence"),
+  },
+  {
+    href: "/dashboard/chain-of-custody",
+    label: "Chain of custody",
+    icon: Link2,
+    match: (pathname: string) =>
+      pathname.startsWith("/dashboard/chain-of-custody"),
+  },
+  {
+    href: "/dashboard/activity",
+    label: "Activity log",
+    icon: Activity,
+    match: (pathname: string) => pathname.startsWith("/dashboard/activity"),
+  },
 ] as const;
-
-function isActive(pathname: string, href: string) {
-  if (href === "/dashboard") return pathname === "/dashboard";
-  return pathname.startsWith(href);
-}
 
 interface UserSession {
   user: {
@@ -41,6 +75,7 @@ export function DashboardNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [session, setSession] = React.useState<UserSession | null>(null);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   React.useEffect(() => {
     const checkSession = async () => {
@@ -58,91 +93,122 @@ export function DashboardNav() {
     checkSession();
   }, []);
 
-  const active =
-    navItems.find((i) => isActive(pathname, i.href)) ?? navItems[0];
+  React.useEffect(() => {
+    try {
+      setIsCollapsed(
+        localStorage.getItem("casecipher:dashboard-sidebar") === "collapsed",
+      );
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const mobileNavValue =
+    navItems.find((i) => i.match(pathname))?.href ?? navItems[0].href;
 
   return (
-    <aside className="space-y-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-sm font-medium">Dashboard</div>
-          <div className="text-xs text-muted-foreground">
-            CaseCipher workspace
+    <aside
+      className="dashboard-sidebar p-4 sm:p-5"
+      data-collapsed={isCollapsed}
+    >
+      <div className="relative z-10 flex h-full flex-col gap-6">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-3 rounded-xl outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[hsl(213_94%_55%/0.35)] bg-[hsl(213_94%_55%/0.18)] text-[hsl(213_94%_92%)] shadow-[0_8px_28px_hsl(213_94%_25%/0.35)]">
+            <ShieldCheck className="h-5 w-5" aria-hidden />
           </div>
+          <div className="dashboard-sidebar-copy min-w-0">
+            <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-foreground">
+              CaseCipher
+            </span>
+          </div>
+        </Link>
+
+        <div className="md:hidden">
+          <Select
+            value={mobileNavValue}
+            onValueChange={(href) => router.push(href)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Navigate" />
+            </SelectTrigger>
+            <SelectContent>
+              {navItems.map((i) => (
+                <SelectItem key={i.href} value={i.href}>
+                  {i.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <Badge variant="outline" className="hidden md:inline-flex">
-          Menu
-        </Badge>
-      </div>
 
-      {/* Mobile: dropdown nav */}
-      <div className="md:hidden">
-        <Select value={active.href} onValueChange={(href) => router.push(href)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Navigate" />
-          </SelectTrigger>
-          <SelectContent>
-            {navItems.map((i) => (
-              <SelectItem key={i.href} value={i.href}>
-                {i.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="hidden h-full min-h-0 md:flex md:flex-col">
+          <div className="dashboard-sidebar-copy dashboard-rail-label px-1">
+            Navigation
+          </div>
+          <nav className="mt-3 space-y-1.5">
+            {navItems.map((i) => {
+              const activeItem = i.match(pathname);
+              const Icon = i.icon;
+              return (
+                <Link
+                  key={i.href}
+                  href={i.href}
+                  data-active={activeItem}
+                  className="dashboard-nav-link"
+                  aria-current={activeItem ? "page" : undefined}
+                  aria-label={i.label}
+                  title={isCollapsed ? i.label : undefined}
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="dashboard-nav-icon">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="dashboard-sidebar-copy min-w-0 text-sm font-medium leading-none">
+                      {i.label}
+                    </span>
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
 
-      {/* Desktop: sidebar */}
-      <div className="hidden md:block">
-        <nav className="space-y-1">
-          {navItems.map((i) => {
-            const activeItem = isActive(pathname, i.href);
-            return (
-              <Link
-                key={i.href}
-                href={i.href}
-                className={cn(
-                  "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-                  activeItem
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                )}
-              >
-                <span>{i.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-        <Separator className="my-4" />
+          <Separator className="my-5 bg-white/10" />
 
-        {/* User info */}
-        {session?.user && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
-                {session.user.image ? (
-                  // biome-ignore lint/performance/noImgElement: External OAuth profile images
-                  <img
-                    src={session.user.image}
-                    alt=""
-                    className="h-8 w-8 rounded-full"
-                  />
-                ) : (
-                  <User className="h-4 w-4" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">
-                  {session.user.name || "User"}
+          {session?.user ? (
+            <div className="dashboard-sidebar-copy dashboard-user-panel space-y-3 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                  {session.user.image ? (
+                    // biome-ignore lint/performance/noImgElement: External OAuth profile images
+                    <img
+                      src={session.user.image}
+                      alt=""
+                      className="h-10 w-10 rounded-full"
+                    />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {session.user.email}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium text-foreground">
+                    {session.user.name || "User"}
+                  </div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {session.user.email}
+                  </div>
                 </div>
               </div>
             </div>
+          ) : null}
+
+          <div className="mt-auto flex flex-col gap-3 pt-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="w-full"
+              className="dashboard-signout -mx-1 h-10 justify-start gap-2 px-3 text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
               onClick={async () => {
                 try {
                   const { authClient } = await import("@/lib/auth/client");
@@ -152,17 +218,39 @@ export function DashboardNav() {
                   // Handle error
                 }
               }}
+              aria-label="Sign out"
+              title={isCollapsed ? "Sign out" : undefined}
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign out
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span className="dashboard-sidebar-copy">Sign out</span>
             </Button>
-          </div>
-        )}
 
-        <Separator className="my-4" />
-        <div className="text-xs text-muted-foreground">
-          Tip: use <span className="font-mono">New case</span> for full intake
-          details.
+            <button
+              type="button"
+              className="dashboard-collapse-toggle self-center"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-pressed={isCollapsed}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              onClick={() => {
+                const next = !isCollapsed;
+                setIsCollapsed(next);
+                try {
+                  localStorage.setItem(
+                    "casecipher:dashboard-sidebar",
+                    next ? "collapsed" : "expanded",
+                  );
+                } catch {
+                  // ignore
+                }
+              }}
+            >
+              {isCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </aside>

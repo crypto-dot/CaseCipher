@@ -3,11 +3,20 @@ import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-      <div className="mx-auto container px-4 py-8 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-[240px_1fr]"> 
+    <div className="dashboard-shell">
+      <div className="dashboard-shell-inner">
+        <div className="dashboard-shell-grid">
           <DashboardNav />
-          <div className="min-w-0">{children}</div>
+          <main
+            className="dashboard-main flex min-h-[calc(100dvh-2.5rem)] flex-col"
+            aria-label="Dashboard content"
+          >
+            <div className="dashboard-content flex min-h-0 flex-1 flex-col">
+              {children}
+            </div>
+          </main>
         </div>
       </div>
+    </div>
   );
 }
