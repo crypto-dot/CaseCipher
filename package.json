@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "5.2.2",
+    "@neondatabase/auth": "0.1.0-beta.21",
     "@neondatabase/neon-js": "0.1.0-beta.22",
     "@neondatabase/serverless": "1.0.2",
     "@radix-ui/react-label": "2.1.8",
@@ -27,7 +28,7 @@
     "date-fns": "4.1.0",
     "drizzle-orm": "0.45.1",
     "lucide-react": "0.561.0",
-    "next": "16.0.10",
+    "next": "16.2.6",
     "react": "19.2.1",
     "react-day-picker": "9.13.0",
     "react-dom": "19.2.1",
