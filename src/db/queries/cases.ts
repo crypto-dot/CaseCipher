@@ -1,15 +1,20 @@
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
-  type Case,
-  type CasePriority,
-  type CaseStatus,
   caseNotes,
   cases,
   clients,
   evidence,
-  type NewCase,
 } from "@/db/schema";
+import type {
+  Case,
+  CasePriority,
+  CaseStatus,
+  NewCase,
+  UpdateCaseData,
+} from "@/lib/case-types";
+
+export type { Case, NewCase, UpdateCaseData } from "@/lib/case-types";
 
 export interface ListCasesOptions {
   userId?: string;
@@ -184,7 +189,7 @@ export async function createCase(data: NewCase): Promise<Case> {
  */
 export async function updateCase(
   id: string,
-  data: Partial<Omit<Case, "id" | "caseNumber" | "createdAt" | "createdBy">>,
+  data: UpdateCaseData,
 ): Promise<Case | null> {
   const result = await db
     .update(cases)

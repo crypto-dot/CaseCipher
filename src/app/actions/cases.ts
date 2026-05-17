@@ -13,29 +13,15 @@ import {
   updateCaseStatus as dbUpdateCaseStatus,
   type ListCasesOptions,
 } from "@/db/queries/cases";
-import type { CasePriority, CaseStatus, NewCase } from "@/db/schema";
+import {
+  type CaseStatus,
+  type CreateCaseInput,
+  createCaseSchema,
+  type UpdateCaseInput,
+  updateCaseSchema,
+} from "@/lib/case-types";
 
-export interface CreateCaseInput {
-  title: string;
-  clientId?: string;
-  description?: string;
-  status?: CaseStatus;
-  priority?: CasePriority;
-  incidentDate?: string;
-  incidentTime?: string;
-  assignedTo?: string;
-}
-
-export interface UpdateCaseInput {
-  title?: string;
-  clientId?: string;
-  description?: string;
-  status?: CaseStatus;
-  priority?: CasePriority;
-  incidentDate?: string;
-  incidentTime?: string;
-  assignedTo?: string;
-}
+export type { CreateCaseInput, UpdateCaseInput } from "@/lib/case-types";
 
 /**
  * List cases with filters
@@ -65,17 +51,17 @@ export async function createCase(
   input: CreateCaseInput,
   user: { id: string; email: string; name?: string },
 ) {
-  const newCase: NewCase = {
-    title: input.title,
-    clientId: input.clientId || null,
-    description: input.description,
-    status: input.status || "new",
-    priority: input.priority || "medium",
-    incidentDate: input.incidentDate,
-    incidentTime: input.incidentTime,
-    assignedTo: input.assignedTo,
+  const newCase = createCaseSchema.parse({
+    ...input,
+    clientId: input.clientId ?? null,
+    description: input.description ?? null,
+    status: input.status ?? "new",
+    priority: input.priority ?? "medium",
+    incidentDate: input.incidentDate ?? null,
+    incidentTime: input.incidentTime ?? null,
+    assignedTo: input.assignedTo ?? null,
     createdBy: user.id,
-  };
+  });
 
   const created = await dbCreateCase(newCase);
 
@@ -108,7 +94,7 @@ export async function updateCase(
     throw new Error("Case not found");
   }
 
-  const updated = await dbUpdateCase(id, input);
+  const updated = await dbUpdateCase(id, updateCaseSchema.parse(input));
   if (!updated) {
     throw new Error("Failed to update case");
   }

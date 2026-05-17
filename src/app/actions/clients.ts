@@ -10,7 +10,7 @@ import {
   updateClient as dbUpdateClient,
   type ListClientsOptions,
 } from "@/db/queries/clients";
-import type { NewClient } from "@/db/schema";
+import type { clients } from "@/db/schema";
 
 export interface CreateClientInput {
   name: string;
@@ -49,12 +49,15 @@ export async function createClient(
   input: CreateClientInput,
   user: { id: string; email: string; name?: string },
 ) {
-  const newClient: NewClient = {
+  const newClient: typeof clients.$inferInsert = {
+    id: crypto.randomUUID(),
     name: input.name,
-    contactEmail: input.contactEmail,
-    contactPhone: input.contactPhone,
-    address: input.address,
-    notes: input.notes,
+    contactEmail: input.contactEmail || null,
+    contactPhone: input.contactPhone || null,
+    address: input.address || null,
+    notes: input.notes || null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   const created = await dbCreateClient(newClient);

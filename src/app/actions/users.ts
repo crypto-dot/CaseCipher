@@ -11,8 +11,7 @@ import {
   type ListUsersOptions,
   listUserProfiles,
 } from "@/db/queries/users";
-import type { UserRole } from "@/db/schema";
-
+import type { userRoleSchema } from "@/lib/user-types";
 /**
  * List user profiles
  */
@@ -39,7 +38,7 @@ export async function getAssignableUsers() {
  */
 export async function updateUserRole(
   targetUserId: string,
-  role: UserRole,
+  role: userRoleSchema,
   admin: { id: string; email: string; name?: string },
 ) {
   const before = await getUserProfileByUserId(targetUserId);

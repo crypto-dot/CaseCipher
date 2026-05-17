@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 // Use the localStorage-based API for now until database is configured
 // Once DATABASE_URL is set, these can be switched to use server actions
 import {
-  type CreateCaseInput,
+  type CreateCaseFormInput,
   createCase,
   listCases,
   reassignCase,
@@ -26,7 +26,7 @@ export function useCases() {
 export function useCreateCase() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateCaseInput) => createCase(input),
+    mutationFn: (input: CreateCaseFormInput) => createCase(input),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: keys.cases });
     },

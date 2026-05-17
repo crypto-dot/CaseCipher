@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, index, foreignKey, uuid, text, timestamp, unique, boolean, uniqueIndex, jsonb, date, time, integer, pgEnum } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, index, foreignKey, uuid, text, timestamp, unique, boolean, uniqueIndex, jsonb, date, time, varchar, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 const neonAuth = pgSchema("neon_auth");
@@ -7,7 +7,7 @@ export const caseStatus = pgEnum("case_status", ['new', 'in_progress', 'blocked'
 export const userRole = pgEnum("user_role", ['admin', 'manager', 'analyst', 'examiner'])
 
 
- const invitationInNeonAuth = neonAuth.table("invitation", {
+export const invitationInNeonAuth = neonAuth.table("invitation", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	organizationId: uuid().notNull(),
 	email: text().notNull(),
@@ -31,7 +31,7 @@ export const userRole = pgEnum("user_role", ['admin', 'manager', 'analyst', 'exa
 		}).onDelete("cascade"),
 ]);
 
-const userInNeonAuth = neonAuth.table("user", {
+export const userInNeonAuth = neonAuth.table("user", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	name: text().notNull(),
 	email: text().notNull(),
@@ -47,7 +47,7 @@ const userInNeonAuth = neonAuth.table("user", {
 	unique("user_email_key").on(table.email),
 ]);
 
-const sessionInNeonAuth = neonAuth.table("session", {
+export const sessionInNeonAuth = neonAuth.table("session", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	expiresAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
 	token: text().notNull(),
@@ -68,7 +68,7 @@ const sessionInNeonAuth = neonAuth.table("session", {
 	unique("session_token_key").on(table.token),
 ]);
 
-const organizationInNeonAuth = neonAuth.table("organization", {
+export const organizationInNeonAuth = neonAuth.table("organization", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	name: text().notNull(),
 	slug: text().notNull(),
@@ -80,7 +80,7 @@ const organizationInNeonAuth = neonAuth.table("organization", {
 	unique("organization_slug_key").on(table.slug),
 ]);
 
-const accountInNeonAuth = neonAuth.table("account", {
+export const accountInNeonAuth = neonAuth.table("account", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	accountId: text().notNull(),
 	providerId: text().notNull(),
@@ -122,7 +122,7 @@ const jwksInNeonAuth = neonAuth.table("jwks", {
 	expiresAt: timestamp({ withTimezone: true, mode: 'string' }),
 });
 
-const memberInNeonAuth = neonAuth.table("member", {
+export const memberInNeonAuth = neonAuth.table("member", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	organizationId: uuid().notNull(),
 	userId: uuid().notNull(),
@@ -143,7 +143,7 @@ const memberInNeonAuth = neonAuth.table("member", {
 		}).onDelete("cascade"),
 ]);
 
-const projectConfigInNeonAuth = neonAuth.table("project_config", {
+export const projectConfigInNeonAuth = neonAuth.table("project_config", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	name: text().notNull(),
 	endpointId: text("endpoint_id").notNull(),
@@ -158,7 +158,7 @@ const projectConfigInNeonAuth = neonAuth.table("project_config", {
 	unique("project_config_endpoint_id_key").on(table.endpointId),
 ]);
 
-const auditLog = pgTable("audit_log", {
+export const auditLog = pgTable("audit_log", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	userId: text("user_id").notNull(),
 	userEmail: text("user_email").notNull(),
@@ -233,21 +233,88 @@ export const clients = pgTable("clients", {
 	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
 });
 
+export const personnel = pgTable("personnel", {
+	id: uuid("person_id").defaultRandom().primaryKey().notNull(),
+	fullName: varchar("full_name", { length: 150 }).notNull(),
+	badgeOrEmployeeId: varchar("badge_or_employee_id", { length: 50 }),
+	organization: varchar({ length: 100 }),
+	role: varchar({ length: 50 }),
+	email: varchar({ length: 150 }),
+	isActive: boolean("is_active").default(true),
+}, (table) => [
+	unique("personnel_badge_or_employee_id_unique").on(table.badgeOrEmployeeId),
+]);
+
 export const evidence = pgTable("evidence", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
+	id: uuid("evidence_id").defaultRandom().primaryKey().notNull(),
 	caseId: uuid("case_id").notNull(),
-	name: text().notNull(),
+	label: varchar({ length: 100 }).notNull(),
 	description: text(),
-	fileUrl: text("file_url"),
-	fileType: text("file_type"),
-	fileSize: integer("file_size"),
-	chainOfCustody: text("chain_of_custody"),
-	uploadedBy: text("uploaded_by").notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	evidenceType: varchar("evidence_type", { length: 50 }),
+	collectedAt: timestamp("collected_at", { withTimezone: true, mode: 'string' }).notNull(),
+	collectionLocation: text("collection_location"),
+	hashMd5: varchar("hash_md5", { length: 32 }),
+	hashSha256: varchar("hash_sha256", { length: 64 }),
+	hashSha512: varchar("hash_sha512", { length: 128 }),
+	currentLocation: varchar("current_location", { length: 255 }),
+	currentCustodian: uuid("current_custodian").references(() => personnel.id),
+	status: varchar({ length: 30 }).default('active'),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 }, (table) => [
 	foreignKey({
 			columns: [table.caseId],
 			foreignColumns: [cases.id],
 			name: "evidence_case_id_cases_id_fk"
 		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.currentCustodian],
+			foreignColumns: [personnel.id],
+			name: "evidence_current_custodian_personnel_id_fk"
+		}).onDelete("set null"),
 ]);
+
+export const custodyEvents = pgTable("custody_events", {
+	id: uuid("event_id").defaultRandom().primaryKey().notNull(),
+	evidenceId: uuid("evidence_id").notNull(),
+	eventType: varchar("event_type", { length: 50 }).notNull(),
+	fromCustodian: uuid("from_custodian"),
+	toCustodian: uuid("to_custodian"),
+	fromLocation: varchar("from_location", { length: 255 }),
+	toLocation: varchar("to_location", { length: 255 }),
+	reason: text(),
+	notes: text(),
+	eventTimestamp: timestamp("event_timestamp", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	recordedBy: uuid("recorded_by").notNull(),
+	transferorSignature: text("transferor_signature"),
+	recipientSignature: text("recipient_signature"),
+	signatureVerified: boolean("signature_verified").default(false),
+	rowHash: varchar("row_hash", { length: 64 }),
+}, (table) => [
+	foreignKey({
+			columns: [table.evidenceId],
+			foreignColumns: [evidence.id],
+			name: "custody_events_evidence_id_evidence_id_fk"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.fromCustodian],
+			foreignColumns: [personnel.id],
+			name: "custody_events_from_custodian_personnel_id_fk"
+		}).onDelete("set null"),
+	foreignKey({
+			columns: [table.toCustodian],
+			foreignColumns: [personnel.id],
+			name: "custody_events_to_custodian_personnel_id_fk"
+		}).onDelete("set null"),
+	foreignKey({
+			columns: [table.recordedBy],
+			foreignColumns: [personnel.id],
+			name: "custody_events_recorded_by_personnel_id_fk"
+		}).onDelete("restrict"),
+]);
+
+export type Personnel = typeof personnel.$inferSelect;
+
+export type Evidence = typeof evidence.$inferSelect;
+
+export type CustodyEvent = typeof custodyEvents.$inferSelect;
+

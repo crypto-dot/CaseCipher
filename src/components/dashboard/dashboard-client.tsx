@@ -25,10 +25,10 @@ import {
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
 import {
-  type CaseItem,
+  type Case,
   type CasePriority,
   type CaseStatus,
-  caseStatusesSchema,
+  caseStatusSchema,
 } from "@/lib/case-types";
 import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
@@ -97,8 +97,9 @@ function statusLabel(status: CaseStatus) {
   }
 }
 
-function formatBoardCaseId(c: CaseItem) {
-  const match = /^CASE-(\d+)$/i.exec(c.id.trim());
+function formatBoardCaseId(c: Case) {
+  const source = c.caseNumber ?? c.id;
+  const match = /^CASE-(\d+)$/i.exec(source.trim());
   const n = match ? Number.parseInt(match[1], 10) : 0;
   const yy = new Date(c.createdAt).getFullYear().toString().slice(-2);
   const seq = Number.isFinite(n) ? n : 0;
@@ -128,11 +129,12 @@ function lastActivityLabel(iso: string) {
   return `${days}d since last activity`;
 }
 
-function caseCategoryLabel(c: CaseItem) {
+function caseCategoryLabel(c: Case) {
   const t = c.title.trim();
   const colon = t.indexOf(":");
   if (colon > 0 && colon < 24) return t.slice(0, colon).trim();
-  return c.client.trim() || "General";
+  const clientMatch = c.description?.match(/^Client:\s*([^.]+)/);
+  return clientMatch?.[1]?.trim() || "General";
 }
 
 export function DashboardClient() {
@@ -148,7 +150,7 @@ export function DashboardClient() {
   );
 
   const casesByColumn = React.useMemo(() => {
-    const map = new Map<BoardColumnId, CaseItem[]>();
+    const map = new Map<BoardColumnId, Case[]>();
     for (const col of BOARD_COLUMNS) {
       map.set(col.id, []);
     }
@@ -265,10 +267,10 @@ export function DashboardClient() {
                             <span
                               className={cn(
                                 "shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-medium capitalize",
-                                priorityPillClass(c.priority),
+                                priorityPillClass(c.priority ?? undefined),
                               )}
                             >
-                              {priorityLabel(c.priority)}
+                              {priorityLabel(c.priority ?? undefined)}
                             </span>
                           </div>
                           <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
@@ -290,7 +292,7 @@ export function DashboardClient() {
                                 aria-hidden
                               />
                               <span className="truncate">
-                                {getAssigneeById(c.assignee)?.firstName ??
+                                {getAssigneeById(c.assignedTo ?? "")?.firstName ??
                                   "Unassigned"}
                               </span>
                             </div>
@@ -299,11 +301,7 @@ export function DashboardClient() {
                                 className="size-3.5 shrink-0 text-muted-foreground/80"
                                 aria-hidden
                               />
-                              <span>
-                                {(c.attachments?.length ?? 0) === 0
-                                  ? "No items"
-                                  : `${c.attachments?.length} items`}
-                              </span>
+                              <span>No items</span>
                             </div>
                           </div>
                           <div className="mt-3 flex items-center gap-1.5 text-[0.7rem] text-muted-foreground">
@@ -320,9 +318,9 @@ export function DashboardClient() {
                                 Assignee
                               </span>
                               <Select
-                                value={c.assignee}
-                                onValueChange={(assignee) =>
-                                  reassignMut.mutate({ id: c.id, assignee })
+                                value={c.assignedTo ?? ""}
+                                onValueChange={(assignedTo) =>
+                                  reassignMut.mutate({ id: c.id, assignedTo })
                                 }
                                 disabled={reassignMut.isPending}
                               >
@@ -359,7 +357,7 @@ export function DashboardClient() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {caseStatusesSchema.options.map((s) => (
+                                  {caseStatusSchema.options.map((s) => (
                                     <SelectItem key={s} value={s}>
                                       {statusLabel(s)}
                                     </SelectItem>

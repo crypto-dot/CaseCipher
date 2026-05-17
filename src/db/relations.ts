@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { organizationInNeonAuth, invitationInNeonAuth, userInNeonAuth, sessionInNeonAuth, accountInNeonAuth, memberInNeonAuth, clients, cases, caseNotes, evidence } from "./schema";
+import { organizationInNeonAuth, invitationInNeonAuth, userInNeonAuth, sessionInNeonAuth, accountInNeonAuth, memberInNeonAuth, clients, cases, caseNotes, personnel, evidence, custodyEvents } from "./schema";
 
 export const invitationInNeonAuthRelations = relations(invitationInNeonAuth, ({one}) => ({
 	organizationInNeonAuth: one(organizationInNeonAuth, {
@@ -69,9 +69,43 @@ export const caseNotesRelations = relations(caseNotes, ({one}) => ({
 	}),
 }));
 
-export const evidenceRelations = relations(evidence, ({one}) => ({
+export const personnelRelations = relations(personnel, ({many}) => ({
+	evidenceAsCustodian: many(evidence),
+	custodyEventsFrom: many(custodyEvents, { relationName: "fromCustodian" }),
+	custodyEventsTo: many(custodyEvents, { relationName: "toCustodian" }),
+	custodyEventsRecorded: many(custodyEvents, { relationName: "recordedBy" }),
+}));
+
+export const evidenceRelations = relations(evidence, ({one, many}) => ({
 	case: one(cases, {
 		fields: [evidence.caseId],
 		references: [cases.id]
+	}),
+	currentCustodianPerson: one(personnel, {
+		fields: [evidence.currentCustodian],
+		references: [personnel.id]
+	}),
+	custodyEvents: many(custodyEvents),
+}));
+
+export const custodyEventsRelations = relations(custodyEvents, ({one}) => ({
+	evidence: one(evidence, {
+		fields: [custodyEvents.evidenceId],
+		references: [evidence.id]
+	}),
+	fromCustodianPerson: one(personnel, {
+		fields: [custodyEvents.fromCustodian],
+		references: [personnel.id],
+		relationName: "fromCustodian",
+	}),
+	toCustodianPerson: one(personnel, {
+		fields: [custodyEvents.toCustodian],
+		references: [personnel.id],
+		relationName: "toCustodian",
+	}),
+	recordedByPerson: one(personnel, {
+		fields: [custodyEvents.recordedBy],
+		references: [personnel.id],
+		relationName: "recordedBy",
 	}),
 }));

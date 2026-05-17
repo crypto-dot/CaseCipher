@@ -47,8 +47,8 @@ import { useCreateCase } from "@/lib/case-hooks";
 import {
   type CaseAttachment,
   type CasePriority,
-  casePrioritiesSchema,
-  caseStatusesSchema,
+  casePrioritySchema,
+  caseStatusSchema,
 } from "@/lib/case-types";
 import { type Assignee, getAssigneeFullName, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
@@ -70,9 +70,9 @@ const newCaseSchema = z.object({
     .string()
     .max(2000, "Description must be 2000 characters or less")
     .optional(),
-  status: caseStatusesSchema,
+  status: caseStatusSchema,
   assignee: z.string().optional(),
-  priority: casePrioritiesSchema,
+  priority: casePrioritySchema,
   incidentDate: z.date().optional(),
   incidentTime: z
     .string()
@@ -116,7 +116,7 @@ export default function NewCasePage() {
       client: values.client,
       description: values.description || undefined,
       status: values.status,
-      assignee: values.assignee || "",
+      assignedTo: values.assignee || "",
       priority: values.priority,
       incidentDate: values.incidentDate
         ? format(values.incidentDate, "yyyy-MM-dd")
@@ -225,7 +225,7 @@ export default function NewCasePage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {caseStatusesSchema.options.map((s) => (
+                          {caseStatusSchema.options.map((s) => (
                             <SelectItem key={s} value={s}>
                               {s.replace("_", " ")}
                             </SelectItem>
@@ -283,7 +283,7 @@ export default function NewCasePage() {
                         <SelectContent>
                           {(
                             Object.keys(
-                              casePrioritiesSchema,
+                              casePrioritySchema,
                             ) as Array<CasePriority>
                           ).map((p: CasePriority) => (
                             <SelectItem key={p} value={p}>

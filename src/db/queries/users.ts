@@ -1,12 +1,10 @@
 import { and, eq, ilike } from "drizzle-orm";
 import { db } from "@/db";
 import {
-  type NewUserProfile,
-  type UserProfile,
-  type UserRole,
   userProfiles,
+  userRole,
 } from "@/db/schema";
-
+import type { UserRole } from "@/lib/user-types";
 export interface ListUsersOptions {
   role?: UserRole;
   active?: boolean;
@@ -24,7 +22,7 @@ export async function listUserProfiles(options: ListUsersOptions = {}) {
   const conditions = [];
 
   if (role) {
-    conditions.push(eq(userProfiles.role, role));
+    conditions.push(eq(userProfiles.role, role as typeof userRole.enumValues[number]));
   }
 
   if (active !== undefined) {
@@ -50,7 +48,7 @@ export async function listUserProfiles(options: ListUsersOptions = {}) {
  */
 export async function getUserProfileByUserId(
   userId: string,
-): Promise<UserProfile | null> {
+): Promise<typeof userProfiles.$inferSelect | null> {
   const result = await db
     .select()
     .from(userProfiles)
@@ -65,7 +63,7 @@ export async function getUserProfileByUserId(
  */
 export async function getUserProfileById(
   id: string,
-): Promise<UserProfile | null> {
+): Promise<typeof userProfiles.$inferSelect | null> {
   const result = await db
     .select()
     .from(userProfiles)
@@ -80,8 +78,8 @@ export async function getUserProfileById(
  */
 export async function upsertUserProfile(
   userId: string,
-  data: Partial<Omit<NewUserProfile, "userId">> = {},
-): Promise<UserProfile> {
+  data: Partial<Omit<typeof userProfiles.$inferInsert, "userId">> = {},
+): Promise<typeof userProfiles.$inferSelect> {
   const existing = await getUserProfileByUserId(userId);
 
   if (existing) {
@@ -99,7 +97,7 @@ export async function upsertUserProfile(
     .insert(userProfiles)
     .values({
       userId,
-      role: data.role ?? "examiner",
+      role: data.role ?? userRole.enumValues[3],
       badgeNumber: data.badgeNumber,
       active: data.active ?? true,
     })
@@ -113,8 +111,8 @@ export async function upsertUserProfile(
  */
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Omit<UserProfile, "id" | "userId" | "createdAt">>,
-): Promise<UserProfile | null> {
+  data: Partial<Omit<typeof userProfiles.$inferSelect, "id" | "userId" | "createdAt">>,
+): Promise<typeof userProfiles.$inferSelect | null> {
   const result = await db
     .update(userProfiles)
     .set(data)
@@ -130,7 +128,7 @@ export async function updateUserProfile(
 export async function updateUserRole(
   userId: string,
   role: UserRole,
-): Promise<UserProfile | null> {
+): Promise<typeof userProfiles.$inferSelect | null> {
   return updateUserProfile(userId, { role });
 }
 
@@ -140,7 +138,7 @@ export async function updateUserRole(
 export async function setUserActive(
   userId: string,
   active: boolean,
-): Promise<UserProfile | null> {
+): Promise<typeof userProfiles.$inferSelect | null> {
   return updateUserProfile(userId, { active });
 }
 
@@ -151,7 +149,7 @@ export async function getUsersByRole(role: UserRole) {
   return db
     .select()
     .from(userProfiles)
-    .where(and(eq(userProfiles.role, role), eq(userProfiles.active, true)));
+    .where(and(eq(userProfiles.role, role as typeof userRole.enumValues[number]), eq(userProfiles.active, true)));
 }
 
 /**

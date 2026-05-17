@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { type Evidence, evidence, type NewEvidence } from "@/db/schema";
-
+import { evidence } from "@/db/schema";
+import type {EvidenceItem } from "@/lib/evidence-types";
 /**
  * List evidence for a case
  */
@@ -16,7 +16,7 @@ export async function listEvidenceByCase(caseId: string) {
 /**
  * Get evidence by ID
  */
-export async function getEvidenceById(id: string): Promise<Evidence | null> {
+export async function getEvidenceById(id: string): Promise<typeof evidence.$inferSelect | null> {
   const result = await db
     .select()
     .from(evidence)
@@ -29,7 +29,7 @@ export async function getEvidenceById(id: string): Promise<Evidence | null> {
 /**
  * Create new evidence
  */
-export async function createEvidence(data: NewEvidence): Promise<Evidence> {
+export async function createEvidence(data: EvidenceItem ): Promise<typeof evidence.$inferSelect> {
   const result = await db.insert(evidence).values(data).returning();
   return result[0];
 }
@@ -39,7 +39,7 @@ export async function createEvidence(data: NewEvidence): Promise<Evidence> {
  */
 export async function updateEvidence(
   id: string,
-  data: Partial<Omit<Evidence, "id" | "caseId" | "uploadedBy" | "createdAt">>,
+  data: Partial<Omit<EvidenceItem , "id" | "caseId" | "createdAt">>,
 ): Promise<Evidence | null> {
   const result = await db
     .update(evidence)

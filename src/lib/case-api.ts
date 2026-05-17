@@ -1,13 +1,14 @@
 import {
-  type CaseAttachment,
-  type CaseItem,
-  type CasePriority,
+  type Case,
   type CaseStatus,
-  caseStatusesSchema,
+  caseSchema,
+  caseStatusSchema,
+  type CreateCaseInput,
 } from "@/lib/case-types";
 import { assigneeIdSchema } from "@/lib/mocks";
 
 const STORAGE_KEY = "casecipher:cases:v1";
+const MOCK_CREATED_BY = "mock-user";
 
 function nowIso() {
   return new Date().toISOString();
@@ -22,110 +23,145 @@ function safeParse<T>(value: string | null): T | null {
   }
 }
 
-function seedCases(): CaseItem[] {
+function seedCases(): Case[] {
   const t = nowIso();
   return [
     {
-      id: "CASE-1001",
+      id: "00000000-0000-4000-8000-000000000001",
+      caseNumber: "CASE-1001",
       title: "Intake: Missing documentation",
-      client: "Northwind Logistics",
-      description: "Collect signed authorization and verify incident date.",
+      clientId: null,
+      description: "Client: Northwind Logistics. Collect signed authorization and verify incident date.",
       status: "new",
-      assignee: "1", // Alex Chen
+      priority: "medium",
+      incidentDate: null,
+      incidentTime: null,
+      assignedTo: "1",
+      createdBy: MOCK_CREATED_BY,
       createdAt: t,
       updatedAt: t,
     },
     {
-      id: "CASE-1002",
+      id: "00000000-0000-4000-8000-000000000002",
+      caseNumber: "CASE-1002",
       title: "Review: Evidence packet",
-      client: "Contoso Health",
-      description: "Confirm chain-of-custody and mark sensitive attachments.",
+      clientId: null,
+      description: "Client: Contoso Health. Confirm chain-of-custody and mark sensitive attachments.",
       status: "in_progress",
-      assignee: "3", // Sam Rivera
+      priority: "medium",
+      incidentDate: null,
+      incidentTime: null,
+      assignedTo: "3",
+      createdBy: MOCK_CREATED_BY,
       createdAt: t,
       updatedAt: t,
     },
     {
-      id: "CASE-1003",
+      id: "00000000-0000-4000-8000-000000000003",
+      caseNumber: "CASE-1003",
       title: "Client follow-up: Signature mismatch",
-      client: "Fabrikam Legal",
-      description: "Escalate to client rep and request re-sign within 48h.",
+      clientId: null,
+      description: "Client: Fabrikam Legal. Escalate to client rep and request re-sign within 48h.",
       status: "blocked",
-      assignee: "2", // Jordan Williams
+      priority: "medium",
+      incidentDate: null,
+      incidentTime: null,
+      assignedTo: "2",
+      createdBy: MOCK_CREATED_BY,
       createdAt: t,
       updatedAt: t,
     },
     {
-      id: "CASE-1004",
+      id: "00000000-0000-4000-8000-000000000004",
+      caseNumber: "CASE-1004",
       title: "Closeout: Final report",
-      client: "Globex Corp",
-      description: "Export report PDF and notify stakeholders.",
+      clientId: null,
+      description: "Client: Globex Corp. Export report PDF and notify stakeholders.",
       status: "resolved",
-      assignee: "4", // Taylor Morgan
+      priority: "medium",
+      incidentDate: null,
+      incidentTime: null,
+      assignedTo: "4",
+      createdBy: MOCK_CREATED_BY,
       createdAt: t,
       updatedAt: t,
     },
   ];
 }
 
-function readAll(): CaseItem[] {
+function readAll(): Case[] {
   if (typeof window === "undefined") return seedCases();
   const raw = window.localStorage.getItem(STORAGE_KEY);
-  const parsed = safeParse<CaseItem[]>(raw);
-  if (parsed && Array.isArray(parsed) && parsed.length > 0) return parsed;
+  const parsed = safeParse<unknown[]>(raw);
+  if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+    const cases: Case[] = [];
+    for (const row of parsed) {
+      const result = caseSchema.safeParse(row);
+      if (result.success) cases.push(result.data);
+    }
+    if (cases.length > 0) return cases;
+  }
   const seeded = seedCases();
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
   return seeded;
 }
 
-function writeAll(items: CaseItem[]) {
+function writeAll(items: Case[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
 
-export async function listCases(): Promise<CaseItem[]> {
-  // Simulate network latency for React Query UX.
+export async function listCases(): Promise<Case[]> {
   await new Promise((r) => setTimeout(r, 150));
   return readAll()
     .slice()
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-export type CreateCaseInput = {
+/** Form-friendly create input (maps to DB `CreateCaseInput` in `createCase`). */
+export type CreateCaseFormInput = {
   title: string;
   client: string;
   description?: string;
   status: CaseStatus;
-  assignee: string;
-  priority?: CasePriority;
+  assignedTo: string;
+  priority?: CreateCaseInput["priority"];
   incidentDate?: string;
   incidentTime?: string;
-  attachments?: CaseAttachment[];
 };
 
-function makeId(existing: CaseItem[]) {
+function makeCaseNumber(existing: Case[]) {
   const numeric = existing
-    .map((c) => Number.parseInt(c.id.replace("CASE-", ""), 10))
+    .map((c) => c.caseNumber && /^CASE-(\d+)$/i.exec(c.caseNumber)?.[1])
+    .map((m) => (m ? Number.parseInt(m, 10) : Number.NaN))
     .filter((n) => Number.isFinite(n));
   const next = (numeric.length ? Math.max(...numeric) : 1000) + 1;
   return `CASE-${next}`;
 }
 
-export async function createCase(input: CreateCaseInput): Promise<CaseItem> {
+export async function createCase(input: CreateCaseFormInput): Promise<Case> {
   await new Promise((r) => setTimeout(r, 250));
   const items = readAll();
   const t = nowIso();
-  const newItem: CaseItem = {
-    id: makeId(items),
+  const description = [
+    input.client.trim() ? `Client: ${input.client.trim()}.` : "",
+    input.description?.trim() ?? "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const newItem: Case = {
+    id: crypto.randomUUID(),
+    caseNumber: makeCaseNumber(items),
     title: input.title.trim(),
-    client: input.client.trim(),
-    description: input.description?.trim() || undefined,
+    clientId: null,
+    description: description || null,
     status: input.status,
-    assignee: input.assignee,
-    priority: input.priority,
-    incidentDate: input.incidentDate,
-    incidentTime: input.incidentTime,
-    attachments: input.attachments?.length ? input.attachments : undefined,
+    assignedTo: input.assignedTo || null,
+    priority: input.priority ?? "medium",
+    incidentDate: input.incidentDate ?? null,
+    incidentTime: input.incidentTime ?? null,
+    createdBy: MOCK_CREATED_BY,
     createdAt: t,
     updatedAt: t,
   };
@@ -136,14 +172,14 @@ export async function createCase(input: CreateCaseInput): Promise<CaseItem> {
 export async function updateCaseStatus(params: {
   id: string;
   status: string;
-}): Promise<CaseItem> {
+}): Promise<Case> {
   await new Promise((r) => setTimeout(r, 200));
   const items = readAll();
   const idx = items.findIndex((c) => c.id === params.id);
   if (idx < 0) throw new Error("Case not found");
-  const parsed = caseStatusesSchema.safeParse(params.status);
+  const parsed = caseStatusSchema.safeParse(params.status);
   const status = parsed.success ? parsed.data : items[idx].status;
-  const updated: CaseItem = {
+  const updated: Case = {
     ...items[idx],
     status,
     updatedAt: nowIso(),
@@ -156,17 +192,17 @@ export async function updateCaseStatus(params: {
 
 export async function reassignCase(params: {
   id: string;
-  assignee: string;
-}): Promise<CaseItem> {
+  assignedTo: string;
+}): Promise<Case> {
   await new Promise((r) => setTimeout(r, 200));
   const items = readAll();
   const idx = items.findIndex((c) => c.id === params.id);
   if (idx < 0) throw new Error("Case not found");
-  const parsed = assigneeIdSchema.safeParse(params.assignee);
-  const assignee = parsed.success ? parsed.data : items[idx].assignee;
-  const updated: CaseItem = {
+  const parsed = assigneeIdSchema.safeParse(params.assignedTo);
+  const assignedTo = parsed.success ? parsed.data : items[idx].assignedTo;
+  const updated: Case = {
     ...items[idx],
-    assignee,
+    assignedTo,
     updatedAt: nowIso(),
   };
   const next = items.slice();
