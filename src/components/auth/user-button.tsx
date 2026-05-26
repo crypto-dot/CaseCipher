@@ -27,8 +27,8 @@ export function UserButton() {
         const sessionAtom = authClient.useSession;
 
         // Try to get session state
-        if (sessionAtom && typeof sessionAtom.get === "function") {
-          const state = sessionAtom.get();
+        if (sessionAtom && typeof sessionAtom === "function") {
+          const state = sessionAtom();
           setSession(state?.data ?? null);
         }
       } catch {

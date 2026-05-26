@@ -13,7 +13,7 @@ export function SiteHeader({ className }: { className?: string }) {
 
   useEffect(() => {
     authClient.getSession().then(({ data }) => {
-      setIsAuthenticated(!!data?.user);
+      setIsAuthenticated(data?.session?.userId != null);
       setIsLoading(false);
     });
   }, []);

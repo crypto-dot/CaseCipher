@@ -1,5 +1,5 @@
-import type { UserRole } from "@/db/schema";
 
+import type { UserRole } from "@/lib/user-types";
 /**
  * Permission definitions for CaseCipher RBAC
  */
@@ -36,7 +36,7 @@ export type Permission = keyof typeof PERMISSIONS;
  * Role-based permission mapping
  */
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  admin: [
+  "admin": [
     "cases:read",
     "cases:write",
     "cases:delete",
@@ -52,7 +52,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "system:settings",
     "audit:read",
   ],
-  manager: [
+  "manager": [
     "cases:read",
     "cases:write",
     "cases:assign",
@@ -63,14 +63,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "users:read",
     "audit:read",
   ],
-  analyst: [
+  "analyst": [
     "cases:read",
     "cases:write",
     "evidence:read",
     "evidence:write",
     "clients:read",
   ],
-  examiner: ["cases:read", "evidence:read", "clients:read"],
+  "examiner": ["cases:read", "evidence:read", "clients:read"],
 };
 
 /**
