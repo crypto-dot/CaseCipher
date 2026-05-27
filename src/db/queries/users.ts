@@ -4,7 +4,7 @@ import {
   userProfiles,
   userRole,
 } from "@/db/schema";
-import type { UserRole } from "@/lib/user-types";
+import type { UserRole } from "@/lib/types/user-types";
 export interface ListUsersOptions {
   role?: UserRole;
   active?: boolean;

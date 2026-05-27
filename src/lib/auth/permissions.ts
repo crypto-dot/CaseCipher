@@ -1,5 +1,5 @@
 
-import type { UserRole } from "@/lib/user-types";
+import type { UserRole } from "@/lib/types/user-types";
 /**
  * Permission definitions for CaseCipher RBAC
  */

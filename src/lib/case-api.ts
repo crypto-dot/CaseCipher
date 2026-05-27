@@ -1,10 +1,11 @@
 import {
   type Case,
+  type CaseAttachment,
   type CaseStatus,
   caseSchema,
   caseStatusSchema,
   type CreateCaseInput,
-} from "@/lib/case-types";
+} from "@/lib/types/case-types";
 import { assigneeIdSchema } from "@/lib/mocks";
 
 const STORAGE_KEY = "casecipher:cases:v1";
@@ -128,6 +129,7 @@ export type CreateCaseFormInput = {
   priority?: CreateCaseInput["priority"];
   incidentDate?: string;
   incidentTime?: string;
+  attachments?: CaseAttachment[];
 };
 
 function makeCaseNumber(existing: Case[]) {

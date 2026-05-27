@@ -19,9 +19,9 @@ import {
   createCaseSchema,
   type UpdateCaseInput,
   updateCaseSchema,
-} from "@/lib/case-types";
+} from "@/lib/types/case-types";
 
-export type { CreateCaseInput, UpdateCaseInput } from "@/lib/case-types";
+export type { CreateCaseInput, UpdateCaseInput } from "@/lib/types/case-types";
 
 /**
  * List cases with filters

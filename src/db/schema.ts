@@ -312,9 +312,3 @@ export const custodyEvents = pgTable("custody_events", {
 		}).onDelete("restrict"),
 ]);
 
-export type Personnel = typeof personnel.$inferSelect;
-
-export type Evidence = typeof evidence.$inferSelect;
-
-export type CustodyEvent = typeof custodyEvents.$inferSelect;
-

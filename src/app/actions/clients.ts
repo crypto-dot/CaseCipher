@@ -10,7 +10,7 @@ import {
   updateClient as dbUpdateClient,
   type ListClientsOptions,
 } from "@/db/queries/clients";
-import type { clients } from "@/db/schema";
+import type { NewClient } from "@/lib/types/client-types";
 
 export interface CreateClientInput {
   name: string;
@@ -49,15 +49,12 @@ export async function createClient(
   input: CreateClientInput,
   user: { id: string; email: string; name?: string },
 ) {
-  const newClient: typeof clients.$inferInsert = {
-    id: crypto.randomUUID(),
+  const newClient: NewClient = {
     name: input.name,
-    contactEmail: input.contactEmail || null,
-    contactPhone: input.contactPhone || null,
-    address: input.address || null,
-    notes: input.notes || null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    contactEmail: input.contactEmail ?? null,
+    contactPhone: input.contactPhone ?? null,
+    address: input.address ?? null,
+    notes: input.notes ?? null,
   };
 
   const created = await dbCreateClient(newClient);
@@ -66,7 +63,7 @@ export async function createClient(
   await createAuditLog({
     userId: user.id,
     userEmail: user.email,
-    userName: user.name,
+    userName: user.name ?? null,
     action: "client.created",
     entityType: "client",
     entityId: created.id,
@@ -100,7 +97,7 @@ export async function updateClient(
   await createAuditLog({
     userId: user.id,
     userEmail: user.email,
-    userName: user.name,
+    userName: user.name ?? null,
     action: "client.updated",
     entityType: "client",
     entityId: id,
@@ -133,7 +130,7 @@ export async function deleteClient(
   await createAuditLog({
     userId: user.id,
     userEmail: user.email,
-    userName: user.name,
+    userName: user.name ?? null,
     action: "client.deleted",
     entityType: "client",
     entityId: id,

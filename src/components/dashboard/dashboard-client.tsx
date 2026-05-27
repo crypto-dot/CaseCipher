@@ -29,7 +29,7 @@ import {
   type CasePriority,
   type CaseStatus,
   caseStatusSchema,
-} from "@/lib/case-types";
+} from "@/lib/types/case-types";
 import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
 

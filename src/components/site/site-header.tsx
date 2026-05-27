@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth/client";
+import { cn } from "@/lib/utils";
 
 export function SiteHeader({ className }: { className?: string }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,21 +20,18 @@ export function SiteHeader({ className }: { className?: string }) {
 
   return (
     <header
-      className={cn(
-        "sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur",
-        className,
-      )}
+      className={cn("sticky top-0 z-40 w-full px-3 py-3 sm:px-4", className)}
     >
       <nav
         aria-label="Site header"
-        className="mx-auto container flex h-16 items-center justify-between px-4 sm:px-6"
+        className="mx-auto container flex h-14 items-center justify-between rounded-2xl bg-card/55 px-4 shadow-[0_18px_60px_hsl(222_70%_3%/0.22),inset_0_1px_0_hsl(210_40%_96%/0.06)] backdrop-blur-xl sm:px-5"
       >
         <div className="flex items-center gap-8">
           <Link
             href="/"
             className="flex items-center gap-2 font-semibold tracking-tight"
           >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_10px_28px_hsl(var(--primary)/0.28)]">
               CC
             </span>
             <span>CaseCipher</span>

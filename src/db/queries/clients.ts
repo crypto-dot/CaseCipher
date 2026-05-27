@@ -1,6 +1,11 @@
 import { eq, ilike, or } from "drizzle-orm";
 import { db } from "@/db";
-import { type Client, clients, type NewClient } from "@/db/schema";
+import { clients } from "@/db/schema";
+import type {
+  Client,
+  NewClient,
+  UpdateClientInput,
+} from "@/lib/types/client-types";
 
 export interface ListClientsOptions {
   search?: string;
@@ -54,7 +59,7 @@ export async function createClient(data: NewClient): Promise<Client> {
  */
 export async function updateClient(
   id: string,
-  data: Partial<Omit<Client, "id" | "createdAt">>,
+  data: UpdateClientInput,
 ): Promise<Client | null> {
   const result = await db
     .update(clients)

@@ -1,7 +1,11 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { evidence } from "@/db/schema";
-import type {EvidenceItem } from "@/lib/evidence-types";
+import type {
+  CreateEvidenceInput,
+  EvidenceItem,
+  UpdateEvidenceInput,
+} from "@/lib/types/evidence-types";
 /**
  * List evidence for a case
  */
@@ -29,7 +33,7 @@ export async function getEvidenceById(id: string): Promise<typeof evidence.$infe
 /**
  * Create new evidence
  */
-export async function createEvidence(data: EvidenceItem ): Promise<typeof evidence.$inferSelect> {
+export async function createEvidence(data: CreateEvidenceInput): Promise<EvidenceItem> {
   const result = await db.insert(evidence).values(data).returning();
   return result[0];
 }
@@ -39,8 +43,8 @@ export async function createEvidence(data: EvidenceItem ): Promise<typeof eviden
  */
 export async function updateEvidence(
   id: string,
-  data: Partial<Omit<EvidenceItem , "id" | "caseId" | "createdAt">>,
-): Promise<Evidence | null> {
+  data: UpdateEvidenceInput,
+): Promise<EvidenceItem | null> {
   const result = await db
     .update(evidence)
     .set(data)

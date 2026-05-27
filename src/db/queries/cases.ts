@@ -12,9 +12,9 @@ import type {
   CaseStatus,
   NewCase,
   UpdateCaseData,
-} from "@/lib/case-types";
+} from "@/lib/types/case-types";
 
-export type { Case, NewCase, UpdateCaseData } from "@/lib/case-types";
+export type { Case, NewCase, UpdateCaseData } from "@/lib/types/case-types";
 
 export interface ListCasesOptions {
   userId?: string;

@@ -8,177 +8,198 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   return (
-    <div className="dashboard-shell">
+    <div className="overflow-hidden">
       <section className="dashboard-main">
         <div className="dashboard-shell-inner">
-          <div className="mx-auto container px-4 py-20 sm:px-6 sm:py-24">
-            <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div className="space-y-6">
-              <p className="inline-flex items-center rounded-full border border-white/12 bg-white/5 px-3 py-1 text-xs text-muted-foreground">
-                Case management, encrypted-by-design workflow
-              </p>
-              <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-                CaseCipher keeps your team aligned on every case.
-              </h1>
-              <p className="max-w-xl text-pretty text-lg leading-7 text-muted-foreground">
-                Track status, ownership, and work-in-progress in one clean
-                dashboard. Create cases in seconds, route them to the right
-                person, and keep a clear audit trail.
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button asChild size="lg">
-                  <Link href="/dashboard">Open dashboard</Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-white/15 bg-white/4 text-foreground shadow-none hover:bg-white/[0.07]"
-                >
-                  <Link href="/about">How it works</Link>
-                </Button>
+          <div className="mx-auto container px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="space-y-8">
+                <div className="inline-flex items-center rounded-full bg-white/6 px-3 py-1 text-xs font-medium text-muted-foreground shadow-[inset_0_1px_0_hsl(210_40%_96%/0.06)]">
+                  Case management, encrypted-by-design workflow
+                </div>
+                <div className="space-y-5">
+                  <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
+                    CaseCipher keeps every case clear, current, and accountable.
+                  </h1>
+                  <p className="max-w-2xl text-pretty text-lg leading-8 text-muted-foreground">
+                    Bring intake, ownership, status, and activity into one calm
+                    workspace so teams can move faster without losing the audit
+                    trail.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Button asChild size="lg" className="rounded-full px-7">
+                    <Link href="/dashboard">Open dashboard</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="rounded-full bg-white/4 px-7 text-foreground shadow-none hover:bg-white/8"
+                  >
+                    <Link href="/about">How it works</Link>
+                  </Button>
+                </div>
+                <div className="grid max-w-xl grid-cols-3 gap-3 rounded-3xl bg-card/45 p-2 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)] backdrop-blur">
+                  <div className="rounded-2xl bg-white/4 p-4">
+                    <div className="text-2xl font-semibold tracking-tight">
+                      4
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Status lanes
+                    </div>
+                  </div>
+                  <div className="rounded-2xl bg-white/4 p-4">
+                    <div className="text-2xl font-semibold tracking-tight">
+                      1
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Source of truth
+                    </div>
+                  </div>
+                  <div className="rounded-2xl bg-white/4 p-4">
+                    <div className="text-2xl font-semibold tracking-tight">
+                      ∞
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Team clarity
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-6 pt-4 text-sm">
-                <div>
-                  <div className="text-2xl font-semibold tracking-tight">4</div>
-                  <div className="text-muted-foreground">Statuses</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-semibold tracking-tight">1</div>
-                  <div className="text-muted-foreground">Source of truth</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-semibold tracking-tight">∞</div>
-                  <div className="text-muted-foreground">Clarity</div>
-                </div>
-              </div>
-            </div>
 
-            <Card className="relative overflow-hidden">
-              <CardHeader>
-                <CardTitle>Operational snapshot</CardTitle>
-                <CardDescription>
-                  A quick view of case status and who’s actively working.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border bg-background/60 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium">
-                      CASE-1002 · Evidence packet
+              <Card className="relative overflow-hidden rounded-4xl bg-card/70">
+                <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+                <CardHeader className="relative">
+                  <div className="mb-3 inline-flex w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                    Live operations
+                  </div>
+                  <CardTitle>Operational snapshot</CardTitle>
+                  <CardDescription>
+                    A quick view of case status and who is actively working.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <div className="rounded-2xl bg-background/55 p-4 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)]">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="font-medium">
+                        CASE-1002 · Evidence packet
+                      </div>
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
+                        In progress
+                      </span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      In progress
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Assignee: Sam</span>
-                    <span>Updated: minutes ago</span>
-                  </div>
-                </div>
-                <div className="rounded-lg border bg-background/60 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium">
-                      CASE-1003 · Signature mismatch
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      Blocked
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Assignee: Jordan</span>
-                    <span>Needs: client response</span>
-                  </div>
-                </div>
-                <Separator />
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm font-medium">Ownership clarity</div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      See who is responsible for each case at a glance.
+                    <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Assignee: Sam</span>
+                      <span>Updated minutes ago</span>
                     </div>
                   </div>
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm font-medium">Fast intake</div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      Validate new cases with clean forms and required fields.
+                  <div className="rounded-2xl bg-background/45 p-4 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.04)]">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="font-medium">
+                        CASE-1003 · Signature mismatch
+                      </div>
+                      <span className="rounded-full bg-white/6 px-2.5 py-1 text-xs text-muted-foreground">
+                        Blocked
+                      </span>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Assignee: Jordan</span>
+                      <span>Needs client response</span>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-white/4 p-4">
+                      <div className="text-sm font-medium">
+                        Ownership clarity
+                      </div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        See who is responsible for each case at a glance.
+                      </div>
+                    </div>
+                    <div className="rounded-2xl bg-white/4 p-4">
+                      <div className="text-sm font-medium">Fast intake</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Validate new cases with clean forms and required fields.
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="dashboard-main border-t border-white/10">
+      <section className="dashboard-main">
         <div className="dashboard-shell-inner">
-          <div className="mx-auto container px-4 py-16 sm:px-6">
-            <div className="flex flex-col gap-3">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                Everything you need to run a case workflow
-              </h2>
-              <p className="max-w-2xl text-muted-foreground">
-                Designed for teams that need consistent intake, transparent
-                ownership, and reliable status reporting.
-              </p>
-            </div>
-
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Status you can trust</CardTitle>
-                  <CardDescription>
-                    Standardized states and quick transitions.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  Keep your pipeline accurate with explicit status changes and
-                  consistent labels.
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Clear ownership</CardTitle>
-                  <CardDescription>
-                    Know who’s working on what—instantly.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  Reassign in one click and keep work balanced across the team.
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Validated intake</CardTitle>
-                  <CardDescription>
-                    Forms with guardrails built in.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  Built with React Hook Form + Zod so required fields stay
-                  required.
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border bg-card p-6 sm:flex-row sm:items-center">
-              <div>
-                <div className="text-lg font-semibold tracking-tight">
-                  Ready to try it?
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Jump into the dashboard to see the case workflow.
-                </div>
+          <div className="mx-auto container px-4 pb-20 pt-8 sm:px-6">
+            <div className="rounded-4xl bg-white/3 p-6 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)] sm:p-8">
+              <div className="flex flex-col gap-3">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  Everything you need to run a case workflow
+                </h2>
+                <p className="max-w-2xl text-muted-foreground">
+                  Designed for teams that need consistent intake, transparent
+                  ownership, and reliable status reporting.
+                </p>
               </div>
-              <Button asChild>
-                <Link href="/dashboard">Go to dashboard</Link>
-              </Button>
+
+              <div className="mt-8 grid gap-5 md:grid-cols-3">
+                <Card className="rounded-3xl bg-card/60">
+                  <CardHeader>
+                    <CardTitle>Status you can trust</CardTitle>
+                    <CardDescription>
+                      Standardized states and quick transitions.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Keep your pipeline accurate with explicit status changes and
+                    consistent labels.
+                  </CardContent>
+                </Card>
+                <Card className="rounded-3xl bg-card/60">
+                  <CardHeader>
+                    <CardTitle>Clear ownership</CardTitle>
+                    <CardDescription>
+                      Know who is working on what instantly.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Reassign in one click and keep work balanced across the
+                    team.
+                  </CardContent>
+                </Card>
+                <Card className="rounded-3xl bg-card/60">
+                  <CardHeader>
+                    <CardTitle>Validated intake</CardTitle>
+                    <CardDescription>
+                      Forms with guardrails built in.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Built with React Hook Form + Zod so required fields stay
+                    required.
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary/10 p-6 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.06)] sm:flex-row sm:items-center">
+                <div>
+                  <div className="text-lg font-semibold tracking-tight">
+                    Ready to try it?
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Jump into the dashboard to see the case workflow.
+                  </div>
+                </div>
+                <Button asChild className="rounded-full px-6">
+                  <Link href="/dashboard">Go to dashboard</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

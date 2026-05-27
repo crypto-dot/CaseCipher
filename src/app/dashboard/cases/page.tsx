@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCases } from "@/lib/case-hooks";
-import type { CaseStatus } from "@/lib/case-types";
+import type { CaseStatus } from "@/lib/types/case-types";
 import { getAssigneeNameById } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
 
@@ -107,7 +107,7 @@ export default function CasesListPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {getAssigneeNameById(c.assignee)}
+                    {c.assignedTo ? getAssigneeNameById(c.assignedTo) : "Unassigned"}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(c.updatedAt).toLocaleString()}

@@ -1,10 +1,10 @@
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  type AuditLogEntry,
-  auditLog,
-  type NewAuditLogEntry,
-} from "@/db/schema";
+import { auditLog } from "@/db/schema";
+import type {
+  AuditLogEntry,
+  NewAuditLogEntry,
+} from "@/lib/types/audit-log-types";
 
 export interface ListAuditLogsOptions {
   userId?: string;
@@ -45,11 +45,11 @@ export async function listAuditLogs(options: ListAuditLogsOptions = {}) {
   }
 
   if (startDate) {
-    conditions.push(gte(auditLog.createdAt, startDate));
+    conditions.push(gte(auditLog.createdAt, startDate.toISOString()));
   }
 
   if (endDate) {
-    conditions.push(lte(auditLog.createdAt, endDate));
+    conditions.push(lte(auditLog.createdAt, endDate.toISOString()));
   }
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -104,12 +104,12 @@ export async function logCaseAction(params: {
   return createAuditLog({
     userId: params.userId,
     userEmail: params.userEmail,
-    userName: params.userName,
+    userName: params.userName ?? null,
     action: `case.${params.action}`,
     entityType: "case",
     entityId: params.caseId,
     changes: params.changes,
-    ipAddress: params.ipAddress,
+    ipAddress: params.ipAddress ?? null,
   });
 }
 
@@ -129,11 +129,11 @@ export async function logEvidenceAction(params: {
   return createAuditLog({
     userId: params.userId,
     userEmail: params.userEmail,
-    userName: params.userName,
+    userName: params.userName ?? null,
     action: `evidence.${params.action}`,
     entityType: "evidence",
     entityId: params.evidenceId,
     changes: { ...params.changes, caseId: params.caseId },
-    ipAddress: params.ipAddress,
+    ipAddress: params.ipAddress ?? null,
   });
 }
