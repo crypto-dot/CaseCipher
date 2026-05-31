@@ -209,8 +209,6 @@ export function DashboardClient() {
                         return (
                           <article
                             key={c.id}
-                            role="button"
-                            tabIndex={0}
                             className="case-board-card group cursor-pointer rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
                             onClick={() => setSelectedCaseId(c.id)}
                             onKeyDown={(e) => {
@@ -276,10 +274,11 @@ export function DashboardClient() {
                               {lastActivityLabel(c.updatedAt)}
                             </div>
 
-                            <div
+                            <button
                               className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3"
                               onClick={(e) => e.stopPropagation()}
                               onKeyDown={(e) => e.stopPropagation()}
+                              type="button"
                             >
                               <div className="grid grid-cols-1 gap-1.5">
                                 <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
@@ -333,7 +332,7 @@ export function DashboardClient() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                            </div>
+                            </button>
                           </article>
                         );
                       })

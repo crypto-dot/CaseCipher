@@ -173,7 +173,7 @@ export const accountInNeonAuth = neonAuth.table(
   ],
 );
 
-const verificationInNeonAuth = neonAuth.table(
+const _verificationInNeonAuth = neonAuth.table(
   "verification",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -195,7 +195,7 @@ const verificationInNeonAuth = neonAuth.table(
   ],
 );
 
-const jwksInNeonAuth = neonAuth.table("jwks", {
+const _jwksInNeonAuth = neonAuth.table("jwks", {
   id: uuid().defaultRandom().primaryKey().notNull(),
   publicKey: text().notNull(),
   privateKey: text().notNull(),

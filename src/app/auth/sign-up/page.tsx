@@ -6,9 +6,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 
 export default function SignUpPage() {
   return (
-    <AuthPageShell
-      eyebrow="Start your workspace"
-    >
+    <AuthPageShell eyebrow="Start your workspace">
       <AuthView
         view="SIGN_UP"
         localization={{
