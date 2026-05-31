@@ -1,13 +1,32 @@
 import { z } from "zod";
 import type { caseNotes, cases } from "@/db/schema";
 
+/** Kanban / workflow stages — status values match board column ids. */
+export const CASE_STAGES = [
+  { id: "new_case", label: "New case" },
+  { id: "intake", label: "Intake" },
+  { id: "processing", label: "Processing" },
+  { id: "investigation", label: "Investigation" },
+  { id: "report", label: "Report" },
+  { id: "review", label: "Review" },
+] as const;
+
+export type CaseStageId = (typeof CASE_STAGES)[number]["id"];
+
 export const caseStatusSchema = z.enum([
-  "new",
-  "in_progress",
-  "blocked",
-  "resolved",
+  "new_case",
+  "intake",
+  "processing",
+  "investigation",
+  "report",
+  "review",
 ]);
 export type CaseStatus = z.infer<typeof caseStatusSchema>;
+
+export function caseStatusLabel(status: CaseStatus): string {
+  const stage = CASE_STAGES.find((s) => s.id === status);
+  return stage?.label ?? status;
+}
 
 /** @deprecated Use `caseStatusSchema` */
 export const caseStatusesSchema = caseStatusSchema;

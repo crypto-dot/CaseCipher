@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm"
 
 const neonAuth = pgSchema("neon_auth");
 export const casePriority = pgEnum("case_priority", ['low', 'medium', 'high'])
-export const caseStatus = pgEnum("case_status", ['new', 'in_progress', 'blocked', 'resolved'])
+export const caseStatus = pgEnum("case_status", ['new_case', 'intake', 'processing', 'investigation', 'report', 'review'])
 export const userRole = pgEnum("user_role", ['admin', 'manager', 'analyst', 'examiner'])
 
 
@@ -190,7 +190,7 @@ export const cases = pgTable("cases", {
 	title: text().notNull(),
 	clientId: uuid("client_id"),
 	description: text(),
-	status: caseStatus().default('new').notNull(),
+	status: caseStatus().default('new_case').notNull(),
 	priority: casePriority().default('medium'),
 	incidentDate: date("incident_date"),
 	incidentTime: time("incident_time"),

@@ -3,4 +3,4 @@ allowBuilds:
   core-js: false
   esbuild: true
   sharp:  true
-minimumReleaseAge: 1440 # 24 hours
+minimumReleaseAge: 4320 # 3 days

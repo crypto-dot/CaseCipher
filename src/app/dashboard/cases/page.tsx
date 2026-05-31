@@ -5,35 +5,10 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCases } from "@/lib/case-hooks";
-import type { CaseStatus } from "@/lib/types/case-types";
+import { stageBadgeClass } from "@/lib/stage-colors";
+import { caseStatusLabel } from "@/lib/types/case-types";
 import { getAssigneeNameById } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
-
-function statusBadgeClass(status: CaseStatus) {
-  switch (status) {
-    case "resolved":
-      return "border-emerald-400/40 bg-emerald-500/15 text-emerald-200";
-    case "blocked":
-      return "border-rose-400/40 bg-rose-500/15 text-rose-200";
-    case "in_progress":
-      return "border-amber-400/40 bg-amber-500/15 text-amber-200";
-    default:
-      return "border-blue-400/40 bg-blue-500/15 text-blue-200";
-  }
-}
-
-function statusLabel(status: CaseStatus) {
-  switch (status) {
-    case "in_progress":
-      return "In progress";
-    case "new":
-      return "New";
-    case "blocked":
-      return "Blocked";
-    case "resolved":
-      return "Resolved";
-  }
-}
 
 export default function CasesListPage() {
   const casesQuery = useCases();
@@ -100,10 +75,10 @@ export default function CasesListPage() {
                       variant="outline"
                       className={cn(
                         "border font-normal",
-                        statusBadgeClass(c.status),
+                        stageBadgeClass(c.status),
                       )}
                     >
-                      {statusLabel(c.status)}
+                      {caseStatusLabel(c.status)}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">

@@ -241,10 +241,12 @@ export async function getCaseStats() {
     .groupBy(cases.status);
 
   const byStatus: Record<CaseStatus, number> = {
-    new: 0,
-    in_progress: 0,
-    blocked: 0,
-    resolved: 0,
+    new_case: 0,
+    intake: 0,
+    processing: 0,
+    investigation: 0,
+    report: 0,
+    review: 0,
   };
 
   for (const row of stats) {

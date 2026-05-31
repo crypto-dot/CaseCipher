@@ -5,15 +5,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 // Use the localStorage-based API for now until database is configured
 // Once DATABASE_URL is set, these can be switched to use server actions
 import {
+  addCaseAttachments,
+  listAllCaseAttachments,
+  listCaseAttachments,
+  removeCaseAttachment,
+} from "@/lib/attachments";
+import {
   type CreateCaseFormInput,
   createCase,
   listCases,
   reassignCase,
   updateCaseStatus,
 } from "@/lib/case-api";
+import type { CaseAttachment } from "@/lib/types/case-types";
 
 const keys = {
   cases: ["cases"] as const,
+  attachments: ["case-attachments"] as const,
 };
 
 export function useCases() {
@@ -49,6 +57,50 @@ export function useReassignCase() {
     mutationFn: reassignCase,
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: keys.cases });
+    },
+  });
+}
+
+export function useCaseAttachments(caseId: string | null) {
+  return useQuery({
+    queryKey: [...keys.attachments, caseId],
+    queryFn: () => listCaseAttachments(caseId as string),
+    enabled: Boolean(caseId),
+  });
+}
+
+export function useAllCaseAttachments() {
+  return useQuery({
+    queryKey: keys.attachments,
+    queryFn: listAllCaseAttachments,
+  });
+}
+
+export function useAddCaseAttachments() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      caseId,
+      attachments,
+    }: {
+      caseId: string;
+      attachments: CaseAttachment[];
+    }) => addCaseAttachments(caseId, attachments),
+    onSuccess: async (_data, { caseId }) => {
+      await qc.invalidateQueries({ queryKey: keys.attachments });
+      await qc.invalidateQueries({ queryKey: [...keys.attachments, caseId] });
+    },
+  });
+}
+
+export function useRemoveCaseAttachment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ caseId, key }: { caseId: string; key: string }) =>
+      removeCaseAttachment(caseId, key),
+    onSuccess: async (_data, { caseId }) => {
+      await qc.invalidateQueries({ queryKey: keys.attachments });
+      await qc.invalidateQueries({ queryKey: [...keys.attachments, caseId] });
     },
   });
 }

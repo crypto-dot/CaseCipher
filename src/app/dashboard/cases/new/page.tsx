@@ -48,6 +48,7 @@ import {
   type CaseAttachment,
   type CasePriority,
   casePrioritySchema,
+  caseStatusLabel,
   caseStatusSchema,
 } from "@/lib/types/case-types";
 import { type Assignee, getAssigneeFullName, mockAssignees } from "@/lib/mocks";
@@ -94,7 +95,7 @@ export default function NewCasePage() {
       title: "",
       client: "",
       description: "",
-      status: "new",
+      status: "new_case",
       assignee: undefined,
       priority: "medium",
       incidentDate: undefined,
@@ -227,7 +228,7 @@ export default function NewCasePage() {
                         <SelectContent>
                           {caseStatusSchema.options.map((s) => (
                             <SelectItem key={s} value={s}>
-                              {s.replace("_", " ")}
+                              {caseStatusLabel(s)}
                             </SelectItem>
                           ))}
                         </SelectContent>

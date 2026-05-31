@@ -19,82 +19,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CaseDetailModal } from "@/components/dashboard/case-detail-modal";
 import {
+  useAllCaseAttachments,
   useCases,
   useReassignCase,
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
+import { stageDotClass } from "@/lib/stage-colors";
+import { priorityLabel, priorityPillClass } from "@/lib/priority-colors";
 import {
   type Case,
-  type CasePriority,
+  type CaseStageId,
   type CaseStatus,
+  CASE_STAGES,
+  caseStatusLabel,
   caseStatusSchema,
 } from "@/lib/types/case-types";
 import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
 
-/** Kanban columns shown in the UI (maps from backend `CaseStatus`). */
-const BOARD_COLUMNS = [
-  {
-    id: "new_case",
-    label: "New case",
-    dotClass: "bg-zinc-200",
-    statuses: ["new"] as const,
-  },
-  {
-    id: "intake",
-    label: "Intake",
-    dotClass: "bg-blue-400",
-    statuses: [] as const,
-  },
-  {
-    id: "processing",
-    label: "Processing",
-    dotClass: "bg-cyan-400",
-    statuses: ["in_progress"] as const,
-  },
-  {
-    id: "investigation",
-    label: "Investigation",
-    dotClass: "bg-amber-400",
-    statuses: ["blocked"] as const,
-  },
-  {
-    id: "report",
-    label: "Report",
-    dotClass: "bg-violet-400",
-    statuses: [] as const,
-  },
-  {
-    id: "review",
-    label: "Review",
-    dotClass: "bg-rose-400",
-    statuses: ["resolved"] as const,
-  },
-] as const;
+/** Kanban columns — each stage maps directly to `CaseStatus`. */
+const BOARD_COLUMNS = CASE_STAGES.map((stage) => ({
+  id: stage.id,
+  label: stage.label,
+  dotClass: stageDotClass(stage.id),
+}));
 
-type BoardColumnId = (typeof BOARD_COLUMNS)[number]["id"];
+type BoardColumnId = CaseStageId;
 
 function columnForCase(status: CaseStatus): BoardColumnId {
-  for (const col of BOARD_COLUMNS) {
-    if ((col.statuses as readonly CaseStatus[]).includes(status)) {
-      return col.id;
-    }
-  }
+  if (caseStatusSchema.safeParse(status).success) return status;
   return "new_case";
-}
-
-function statusLabel(status: CaseStatus) {
-  switch (status) {
-    case "in_progress":
-      return "In progress";
-    case "new":
-      return "New";
-    case "blocked":
-      return "Blocked";
-    case "resolved":
-      return "Resolved";
-  }
 }
 
 function formatBoardCaseId(c: Case) {
@@ -104,22 +60,6 @@ function formatBoardCaseId(c: Case) {
   const yy = new Date(c.createdAt).getFullYear().toString().slice(-2);
   const seq = Number.isFinite(n) ? n : 0;
   return `CAS-${yy}-${String(seq).padStart(4, "0")}`;
-}
-
-function priorityLabel(p: CasePriority | undefined) {
-  const v = p ?? "medium";
-  return v.charAt(0).toUpperCase() + v.slice(1);
-}
-
-function priorityPillClass(p: CasePriority | undefined) {
-  switch (p ?? "medium") {
-    case "high":
-      return "border-rose-400/50 text-rose-200 bg-rose-500/10";
-    case "low":
-      return "border-emerald-400/40 text-emerald-200 bg-emerald-500/10";
-    default:
-      return "border-blue-400/50 text-blue-200 bg-blue-500/10";
-  }
 }
 
 function lastActivityLabel(iso: string) {
@@ -139,13 +79,22 @@ function caseCategoryLabel(c: Case) {
 
 export function DashboardClient() {
   const casesQuery = useCases();
+  const attachmentsQuery = useAllCaseAttachments();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
+  const [selectedCaseId, setSelectedCaseId] = React.useState<string | null>(
+    null,
+  );
 
   const cases = casesQuery.data ?? [];
+  const attachmentsByCase = attachmentsQuery.data ?? {};
+  const selectedCase =
+    selectedCaseId != null
+      ? (cases.find((c) => c.id === selectedCaseId) ?? null)
+      : null;
 
   const activeCount = React.useMemo(
-    () => cases.filter((c) => c.status !== "resolved").length,
+    () => cases.filter((c) => c.status !== "review").length,
     [cases],
   );
 
@@ -255,10 +204,22 @@ export function DashboardClient() {
                         No cases
                       </p>
                     ) : (
-                      list.map((c) => (
+                      list.map((c) => {
+                        const fileCount =
+                          attachmentsByCase[c.id]?.length ?? 0;
+                        return (
                         <article
                           key={c.id}
-                          className="case-board-card group rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)]"
+                          role="button"
+                          tabIndex={0}
+                          className="case-board-card group cursor-pointer rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
+                          onClick={() => setSelectedCaseId(c.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setSelectedCaseId(c.id);
+                            }
+                          }}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <span className="font-mono text-[0.7rem] text-muted-foreground">
@@ -301,7 +262,11 @@ export function DashboardClient() {
                                 className="size-3.5 shrink-0 text-muted-foreground/80"
                                 aria-hidden
                               />
-                              <span>No items</span>
+                              <span>
+                                {fileCount === 0
+                                  ? "No items"
+                                  : `${fileCount} ${fileCount === 1 ? "file" : "files"}`}
+                              </span>
                             </div>
                           </div>
                           <div className="mt-3 flex items-center gap-1.5 text-[0.7rem] text-muted-foreground">
@@ -312,7 +277,11 @@ export function DashboardClient() {
                             {lastActivityLabel(c.updatedAt)}
                           </div>
 
-                          <div className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3">
+                          <div
+                            className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3"
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                          >
                             <div className="grid grid-cols-1 gap-1.5">
                               <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
                                 Assignee
@@ -359,7 +328,7 @@ export function DashboardClient() {
                                 <SelectContent>
                                   {caseStatusSchema.options.map((s) => (
                                     <SelectItem key={s} value={s}>
-                                      {statusLabel(s)}
+                                      {caseStatusLabel(s)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -367,7 +336,8 @@ export function DashboardClient() {
                             </div>
                           </div>
                         </article>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </section>
@@ -376,6 +346,14 @@ export function DashboardClient() {
           </div>
         </div>
       )}
+
+      <CaseDetailModal
+        caseItem={selectedCase}
+        open={selectedCaseId != null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedCaseId(null);
+        }}
+      />
 
       <p className="shrink-0 text-xs text-muted-foreground/80">
         Changes are saved locally and persist when you refresh this browser.

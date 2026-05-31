@@ -55,7 +55,7 @@ export async function createCase(
     ...input,
     clientId: input.clientId ?? null,
     description: input.description ?? null,
-    status: input.status ?? "new",
+    status: input.status ?? "new_case",
     priority: input.priority ?? "medium",
     incidentDate: input.incidentDate ?? null,
     incidentTime: input.incidentTime ?? null,

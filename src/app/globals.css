@@ -370,9 +370,65 @@ body {
   box-shadow: none;
 }
 
-.dashboard-main [data-slot="button"][class*="border"] {
+.dashboard-main *:not(a) > button[data-slot="button"][class*="border"] {
   border-color: hsl(var(--border) / 0.55);
   background: hsl(var(--secondary) / 0.65);
+}
+
+.auth-card :where(form) {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-card :where(label) {
+  color: hsl(var(--foreground));
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.auth-card :where(input) {
+  min-height: 2.75rem;
+  width: 100%;
+  border: 1px solid hsl(var(--input));
+  border-radius: 0.9rem;
+  background: hsl(var(--background) / 0.55);
+  color: hsl(var(--foreground));
+  padding-inline: 0.875rem;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.auth-card :where(input::placeholder) {
+  color: hsl(var(--muted-foreground));
+}
+
+.auth-card :where(input:focus-visible) {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+}
+
+.auth-card :where(button) {
+  min-height: 2.75rem;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.auth-card *:not(a) > button[data-slot="button"][class*="border"]:not([class*="underline"]):where(button[type="submit"]) {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.auth-card :where(a) {
+  color: hsl(var(--primary));
+  text-underline-offset: 4px;
+  transition: color 150ms ease;
+}
+
+.auth-card :where(a:hover) {
+  color: hsl(var(--foreground));
 }
 
 .dashboard-shell .dashboard-nav-link {
