@@ -12,7 +12,9 @@ export function priorityPillClass(
   return PRIORITY_COLORS[priority ?? "medium"];
 }
 
-export function priorityLabel(priority: CasePriority | null | undefined): string {
+export function priorityLabel(
+  priority: CasePriority | null | undefined,
+): string {
   const value = priority ?? "medium";
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

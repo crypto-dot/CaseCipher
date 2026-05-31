@@ -205,137 +205,136 @@ export function DashboardClient() {
                       </p>
                     ) : (
                       list.map((c) => {
-                        const fileCount =
-                          attachmentsByCase[c.id]?.length ?? 0;
+                        const fileCount = attachmentsByCase[c.id]?.length ?? 0;
                         return (
-                        <article
-                          key={c.id}
-                          role="button"
-                          tabIndex={0}
-                          className="case-board-card group cursor-pointer rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
-                          onClick={() => setSelectedCaseId(c.id)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              setSelectedCaseId(c.id);
-                            }
-                          }}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-mono text-[0.7rem] text-muted-foreground">
-                              {formatBoardCaseId(c)}
-                            </span>
-                            <span
-                              className={cn(
-                                "shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-medium capitalize",
-                                priorityPillClass(c.priority ?? undefined),
-                              )}
-                            >
-                              {priorityLabel(c.priority ?? undefined)}
-                            </span>
-                          </div>
-                          <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
-                            {c.title}
-                          </h3>
-                          <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Shield
-                                className="size-3.5 shrink-0 text-muted-foreground/80"
-                                aria-hidden
-                              />
-                              <span className="truncate">
-                                {caseCategoryLabel(c)}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <UserRound
-                                className="size-3.5 shrink-0 text-muted-foreground/80"
-                                aria-hidden
-                              />
-                              <span className="truncate">
-                                {getAssigneeById(c.assignedTo ?? "")?.firstName ??
-                                  "Unassigned"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <FolderOpen
-                                className="size-3.5 shrink-0 text-muted-foreground/80"
-                                aria-hidden
-                              />
-                              <span>
-                                {fileCount === 0
-                                  ? "No items"
-                                  : `${fileCount} ${fileCount === 1 ? "file" : "files"}`}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mt-3 flex items-center gap-1.5 text-[0.7rem] text-muted-foreground">
-                            <Clock
-                              className="size-3.5 shrink-0 opacity-80"
-                              aria-hidden
-                            />
-                            {lastActivityLabel(c.updatedAt)}
-                          </div>
-
-                          <div
-                            className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3"
-                            onClick={(e) => e.stopPropagation()}
-                            onKeyDown={(e) => e.stopPropagation()}
+                          <article
+                            key={c.id}
+                            role="button"
+                            tabIndex={0}
+                            className="case-board-card group cursor-pointer rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
+                            onClick={() => setSelectedCaseId(c.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedCaseId(c.id);
+                              }
+                            }}
                           >
-                            <div className="grid grid-cols-1 gap-1.5">
-                              <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
-                                Assignee
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-mono text-[0.7rem] text-muted-foreground">
+                                {formatBoardCaseId(c)}
                               </span>
-                              <Select
-                                value={c.assignedTo ?? ""}
-                                onValueChange={(assignedTo) =>
-                                  reassignMut.mutate({ id: c.id, assignedTo })
-                                }
-                                disabled={reassignMut.isPending}
+                              <span
+                                className={cn(
+                                  "shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-medium capitalize",
+                                  priorityPillClass(c.priority ?? undefined),
+                                )}
                               >
-                                <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
-                                  <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {mockAssignees.map((assignee: Assignee) => (
-                                    <SelectItem
-                                      key={assignee.id}
-                                      value={assignee.id}
-                                    >
-                                      {assignee.firstName} {assignee.lastName}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="grid grid-cols-1 gap-1.5">
-                              <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
-                                Stage
+                                {priorityLabel(c.priority ?? undefined)}
                               </span>
-                              <Select
-                                value={c.status}
-                                onValueChange={(status) =>
-                                  updateStatusMut.mutate({
-                                    id: c.id,
-                                    status: status as CaseStatus,
-                                  })
-                                }
-                                disabled={updateStatusMut.isPending}
-                              >
-                                <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {caseStatusSchema.options.map((s) => (
-                                    <SelectItem key={s} value={s}>
-                                      {caseStatusLabel(s)}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
                             </div>
-                          </div>
-                        </article>
+                            <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+                              {c.title}
+                            </h3>
+                            <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-2">
+                                <Shield
+                                  className="size-3.5 shrink-0 text-muted-foreground/80"
+                                  aria-hidden
+                                />
+                                <span className="truncate">
+                                  {caseCategoryLabel(c)}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <UserRound
+                                  className="size-3.5 shrink-0 text-muted-foreground/80"
+                                  aria-hidden
+                                />
+                                <span className="truncate">
+                                  {getAssigneeById(c.assignedTo ?? "")
+                                    ?.firstName ?? "Unassigned"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <FolderOpen
+                                  className="size-3.5 shrink-0 text-muted-foreground/80"
+                                  aria-hidden
+                                />
+                                <span>
+                                  {fileCount === 0
+                                    ? "No items"
+                                    : `${fileCount} ${fileCount === 1 ? "file" : "files"}`}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-1.5 text-[0.7rem] text-muted-foreground">
+                              <Clock
+                                className="size-3.5 shrink-0 opacity-80"
+                                aria-hidden
+                              />
+                              {lastActivityLabel(c.updatedAt)}
+                            </div>
+
+                            <div
+                              className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3"
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => e.stopPropagation()}
+                            >
+                              <div className="grid grid-cols-1 gap-1.5">
+                                <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+                                  Assignee
+                                </span>
+                                <Select
+                                  value={c.assignedTo ?? ""}
+                                  onValueChange={(assignedTo) =>
+                                    reassignMut.mutate({ id: c.id, assignedTo })
+                                  }
+                                  disabled={reassignMut.isPending}
+                                >
+                                  <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockAssignees.map((assignee: Assignee) => (
+                                      <SelectItem
+                                        key={assignee.id}
+                                        value={assignee.id}
+                                      >
+                                        {assignee.firstName} {assignee.lastName}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid grid-cols-1 gap-1.5">
+                                <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+                                  Stage
+                                </span>
+                                <Select
+                                  value={c.status}
+                                  onValueChange={(status) =>
+                                    updateStatusMut.mutate({
+                                      id: c.id,
+                                      status: status as CaseStatus,
+                                    })
+                                  }
+                                  disabled={updateStatusMut.isPending}
+                                >
+                                  <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {caseStatusSchema.options.map((s) => (
+                                      <SelectItem key={s} value={s}>
+                                        {caseStatusLabel(s)}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </article>
                         );
                       })
                     )}

@@ -6,11 +6,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 
 export default function ResetPasswordPage() {
   return (
-    <AuthPageShell
-      eyebrow="Secure reset"
-      title="Choose a new password"
-      description="Create a new password to regain access to your workspace."
-    >
+    <AuthPageShell eyebrow="Secure reset">
       <AuthView
         view="RESET_PASSWORD"
         localization={{

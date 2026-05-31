@@ -6,11 +6,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthPageShell
-      eyebrow="Recover access"
-      title="Reset your password"
-      description="Enter your email and we will send password reset instructions."
-    >
+    <AuthPageShell eyebrow="Recover access">
       <AuthView
         view="FORGOT_PASSWORD"
         localization={{

@@ -8,8 +8,6 @@ export default function SignUpPage() {
   return (
     <AuthPageShell
       eyebrow="Start your workspace"
-      title="Create an account"
-      description="Set up your CaseCipher access in a few seconds."
     >
       <AuthView
         view="SIGN_UP"

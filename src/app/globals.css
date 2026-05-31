@@ -416,7 +416,11 @@ body {
   box-shadow: none;
 }
 
-.auth-card *:not(a) > button[data-slot="button"][class*="border"]:not([class*="underline"]):where(button[type="submit"]) {
+.auth-card
+  *:not(a)
+  > button[data-slot="button"][class*="border"]:not([class*="underline"]):where(
+    button[type="submit"]
+  ) {
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
 }

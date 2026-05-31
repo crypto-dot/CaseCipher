@@ -7,7 +7,10 @@ import {
 
 const STORAGE_KEY = "casecipher:attachments:v1";
 
-const attachmentsStoreSchema = z.record(z.string(), z.array(caseAttachmentsSchema));
+const attachmentsStoreSchema = z.record(
+  z.string(),
+  z.array(caseAttachmentsSchema),
+);
 
 type AttachmentsStore = z.infer<typeof attachmentsStoreSchema>;
 

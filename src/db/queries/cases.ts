@@ -1,11 +1,6 @@
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  caseNotes,
-  cases,
-  clients,
-  evidence,
-} from "@/db/schema";
+import { caseNotes, cases, clients, evidence } from "@/db/schema";
 import type {
   Case,
   CasePriority,

@@ -6,9 +6,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 
 export default function SignInPage() {
   return (
-    <AuthPageShell
-      eyebrow="Welcome back"
-    >
+    <AuthPageShell eyebrow="Welcome back">
       <AuthView
         view="SIGN_IN"
         localization={{

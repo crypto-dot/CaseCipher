@@ -46,9 +46,7 @@ export const createCustodyEventSchema = custodyEventSchema
     eventTimestamp: z.string().optional(),
     signatureVerified: z.boolean().optional(),
     rowHash: rowHashSchema.optional(),
-  }) satisfies z.ZodType<
-  Omit<typeof custodyEvents.$inferInsert, "id">
->;
+  }) satisfies z.ZodType<Omit<typeof custodyEvents.$inferInsert, "id">>;
 
 export type CreateCustodyEventInput = z.infer<typeof createCustodyEventSchema>;
 

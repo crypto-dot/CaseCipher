@@ -11,16 +11,9 @@ import {
 type AuthPageShellProps = {
   children: ReactNode;
   eyebrow: string;
-  title: string;
-  description: string;
 };
 
-export function AuthPageShell({
-  children,
-  eyebrow,
-  title,
-  description,
-}: AuthPageShellProps) {
+export function AuthPageShell({ children, eyebrow }: AuthPageShellProps) {
   return (
     <section className="dashboard-main relative overflow-hidden">
       <div className="dashboard-shell-inner">
@@ -40,7 +33,9 @@ export function AuthPageShell({
             </div>
           </div>
 
-            <div className="flex-1 justify-end flex auth-card relative">{children}</div>
+          <div className="flex-1 justify-end flex auth-card relative">
+            {children}
+          </div>
         </div>
       </div>
     </section>

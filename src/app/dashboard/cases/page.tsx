@@ -82,7 +82,9 @@ export default function CasesListPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {c.assignedTo ? getAssigneeNameById(c.assignedTo) : "Unassigned"}
+                    {c.assignedTo
+                      ? getAssigneeNameById(c.assignedTo)
+                      : "Unassigned"}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(c.updatedAt).toLocaleString()}

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  FileIcon,
-  Loader2,
-  Trash2,
-  Upload,
-  UserRound,
-} from "lucide-react";
+import { FileIcon, Loader2, Trash2, Upload, UserRound } from "lucide-react";
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -130,7 +124,10 @@ export function CaseDetailModal({
             {caseItem.priority ? (
               <Badge
                 variant="outline"
-                className={cn("capitalize", priorityPillClass(caseItem.priority))}
+                className={cn(
+                  "capitalize",
+                  priorityPillClass(caseItem.priority),
+                )}
               >
                 {priorityLabel(caseItem.priority)}
               </Badge>
@@ -325,8 +322,8 @@ export function CaseDetailModal({
               )}
 
               <p className="text-xs text-muted-foreground/80">
-                Files are stored locally in this browser only. Backend upload
-                is not connected yet.
+                Files are stored locally in this browser only. Backend upload is
+                not connected yet.
               </p>
             </div>
           </div>

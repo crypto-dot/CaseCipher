@@ -1,9 +1,6 @@
 import { and, eq, ilike } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  userProfiles,
-  userRole,
-} from "@/db/schema";
+import { userProfiles, userRole } from "@/db/schema";
 import type { UserRole } from "@/lib/types/user-types";
 export interface ListUsersOptions {
   role?: UserRole;
@@ -22,7 +19,9 @@ export async function listUserProfiles(options: ListUsersOptions = {}) {
   const conditions = [];
 
   if (role) {
-    conditions.push(eq(userProfiles.role, role as typeof userRole.enumValues[number]));
+    conditions.push(
+      eq(userProfiles.role, role as (typeof userRole.enumValues)[number]),
+    );
   }
 
   if (active !== undefined) {
@@ -111,7 +110,9 @@ export async function upsertUserProfile(
  */
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Omit<typeof userProfiles.$inferSelect, "id" | "userId" | "createdAt">>,
+  data: Partial<
+    Omit<typeof userProfiles.$inferSelect, "id" | "userId" | "createdAt">
+  >,
 ): Promise<typeof userProfiles.$inferSelect | null> {
   const result = await db
     .update(userProfiles)
@@ -149,7 +150,12 @@ export async function getUsersByRole(role: UserRole) {
   return db
     .select()
     .from(userProfiles)
-    .where(and(eq(userProfiles.role, role as typeof userRole.enumValues[number]), eq(userProfiles.active, true)));
+    .where(
+      and(
+        eq(userProfiles.role, role as (typeof userRole.enumValues)[number]),
+        eq(userProfiles.active, true),
+      ),
+    );
 }
 
 /**

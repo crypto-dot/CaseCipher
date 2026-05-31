@@ -24,9 +24,7 @@ export const createPersonnelSchema = personnelSchema
   .omit({ id: true, isActive: true })
   .extend({
     isActive: z.boolean().optional(),
-  }) satisfies z.ZodType<
-  Omit<typeof personnel.$inferInsert, "id">
->;
+  }) satisfies z.ZodType<Omit<typeof personnel.$inferInsert, "id">>;
 
 export type CreatePersonnelInput = z.infer<typeof createPersonnelSchema>;
 

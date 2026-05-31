@@ -129,12 +129,8 @@
           "name": "case_notes_case_id_cases_id_fk",
           "tableFrom": "case_notes",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -241,12 +237,8 @@
           "name": "cases_client_id_clients_id_fk",
           "tableFrom": "cases",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -256,9 +248,7 @@
         "cases_case_number_unique": {
           "name": "cases_case_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "case_number"
-          ]
+          "columns": ["case_number"]
         }
       },
       "policies": {},
@@ -402,12 +392,8 @@
           "name": "evidence_case_id_cases_id_fk",
           "tableFrom": "evidence",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -478,16 +464,12 @@
         "user_profiles_user_id_unique": {
           "name": "user_profiles_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "user_profiles_badge_number_unique": {
           "name": "user_profiles_badge_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "badge_number"
-          ]
+          "columns": ["badge_number"]
         }
       },
       "policies": {},
@@ -499,31 +481,17 @@
     "public.case_priority": {
       "name": "case_priority",
       "schema": "public",
-      "values": [
-        "low",
-        "medium",
-        "high"
-      ]
+      "values": ["low", "medium", "high"]
     },
     "public.case_status": {
       "name": "case_status",
       "schema": "public",
-      "values": [
-        "new",
-        "in_progress",
-        "blocked",
-        "resolved"
-      ]
+      "values": ["new", "in_progress", "blocked", "resolved"]
     },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "admin",
-        "manager",
-        "analyst",
-        "examiner"
-      ]
+      "values": ["admin", "manager", "analyst", "examiner"]
     }
   },
   "schemas": {},

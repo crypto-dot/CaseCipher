@@ -20,7 +20,9 @@ export async function listEvidenceByCase(caseId: string) {
 /**
  * Get evidence by ID
  */
-export async function getEvidenceById(id: string): Promise<typeof evidence.$inferSelect | null> {
+export async function getEvidenceById(
+  id: string,
+): Promise<typeof evidence.$inferSelect | null> {
   const result = await db
     .select()
     .from(evidence)
@@ -33,7 +35,9 @@ export async function getEvidenceById(id: string): Promise<typeof evidence.$infe
 /**
  * Create new evidence
  */
-export async function createEvidence(data: CreateEvidenceInput): Promise<EvidenceItem> {
+export async function createEvidence(
+  data: CreateEvidenceInput,
+): Promise<EvidenceItem> {
   const result = await db.insert(evidence).values(data).returning();
   return result[0];
 }

@@ -69,7 +69,10 @@ export const createCaseSchema = caseSchema
     status: caseStatusSchema.optional(),
     priority: casePrioritySchema.optional(),
   }) satisfies z.ZodType<
-  Omit<typeof cases.$inferInsert, "id" | "caseNumber" | "createdAt" | "updatedAt">
+  Omit<
+    typeof cases.$inferInsert,
+    "id" | "caseNumber" | "createdAt" | "updatedAt"
+  >
 >;
 
 export type NewCase = z.infer<typeof createCaseSchema>;
