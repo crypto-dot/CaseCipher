@@ -37,11 +37,28 @@ export type CasePriority = z.infer<typeof casePrioritySchema>;
 /** @deprecated Use `casePrioritySchema` */
 export const casePrioritiesSchema = casePrioritySchema;
 
+export const caseTypeSchema = z.enum([
+  "HR Misconduct",
+  "Fraud",
+  "Compliance",
+  "Security",
+  "Legal",
+  "Other",
+]);
+export type CaseType = z.infer<typeof caseTypeSchema>;
+
 export const caseSchema = z.object({
   id: z.uuid(),
   caseNumber: z.string().nullable(),
   title: z.string().min(1),
   clientId: z.uuid().nullable(),
+  caseType: z.string().nullable(),
+  requestor: z.string().nullable(),
+  assignedExaminer: z.string().nullable(),
+  subjectName: z.string().nullable(),
+  department: z.string().nullable(),
+  dateReceived: z.string().nullable(),
+  dateDue: z.string().nullable(),
   description: z.string().nullable(),
   status: caseStatusSchema,
   priority: casePrioritySchema.nullable(),
@@ -61,18 +78,15 @@ export type CaseItem = Case;
 export const createCaseSchema = caseSchema
   .omit({
     id: true,
-    caseNumber: true,
     createdAt: true,
     updatedAt: true,
   })
   .extend({
+    caseNumber: z.string().min(1).nullable().optional(),
     status: caseStatusSchema.optional(),
     priority: casePrioritySchema.optional(),
   }) satisfies z.ZodType<
-  Omit<
-    typeof cases.$inferInsert,
-    "id" | "caseNumber" | "createdAt" | "updatedAt"
-  >
+  Omit<typeof cases.$inferInsert, "id" | "createdAt" | "updatedAt">
 >;
 
 export type NewCase = z.infer<typeof createCaseSchema>;

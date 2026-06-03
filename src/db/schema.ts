@@ -298,6 +298,13 @@ export const cases = pgTable(
     caseNumber: text("case_number"),
     title: text().notNull(),
     clientId: uuid("client_id"),
+    caseType: text("case_type"),
+    requestor: text(),
+    assignedExaminer: text("assigned_examiner"),
+    subjectName: text("subject_name"),
+    department: text(),
+    dateReceived: date("date_received"),
+    dateDue: date("date_due"),
     description: text(),
     status: caseStatus().default("new_case").notNull(),
     priority: casePriority().default("medium"),
@@ -377,9 +384,26 @@ export const evidence = pgTable(
   {
     id: uuid("evidence_id").defaultRandom().primaryKey().notNull(),
     caseId: uuid("case_id").notNull(),
+    evidenceNumber: varchar("evidence_number", { length: 50 }),
     label: varchar({ length: 100 }).notNull(),
     description: text(),
     evidenceType: varchar("evidence_type", { length: 50 }),
+    dateSeized: date("date_seized"),
+    make: varchar({ length: 100 }),
+    model: varchar({ length: 100 }),
+    serialNumber: varchar("serial_number", { length: 120 }),
+    storageLocation: varchar("storage_location", { length: 255 }),
+    seizedBy: varchar("seized_by", { length: 120 }),
+    acquisitionMethod: varchar("acquisition_method", { length: 50 }),
+    acquisitionTool: varchar("acquisition_tool", { length: 120 }),
+    media: jsonb().$type<
+      Array<{
+        name: string;
+        size: number;
+        type: string;
+        lastModified: number;
+      }>
+    >(),
     collectedAt: timestamp("collected_at", {
       withTimezone: true,
       mode: "string",

@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils";
 function formatBoardCaseId(c: Case) {
   const source = c.caseNumber ?? c.id;
   const match = /^CASE-(\d+)$/i.exec(source.trim());
+  if (!match && c.caseNumber) return c.caseNumber;
   const n = match ? Number.parseInt(match[1], 10) : 0;
   const yy = new Date(c.createdAt).getFullYear().toString().slice(-2);
   const seq = Number.isFinite(n) ? n : 0;
@@ -107,17 +108,26 @@ export function CaseDetailModal({
 
   if (!caseItem) return null;
 
+  const caseDetails = [
+    ["Case type", caseItem.caseType],
+    ["Requestor", caseItem.requestor],
+    ["Subject name", caseItem.subjectName],
+    ["Department", caseItem.department],
+    ["Date received", caseItem.dateReceived],
+    ["Date due", caseItem.dateDue],
+  ] satisfies Array<[string, string | null]>;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[min(90vh,48rem)] gap-0 overflow-hidden rounded-2xl border-white/[0.08] bg-[hsl(222_44%_8%/0.98)] p-0 shadow-[0_24px_64px_hsl(222_70%_3%/0.55)] sm:max-w-xl"
+        className="max-h-[min(90vh,48rem)] gap-0 overflow-hidden rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 shadow-[0_24px_64px_hsl(222_70%_3%/0.55)] sm:max-w-xl"
         showCloseButton
       >
-        <DialogHeader className="gap-3 border-b border-white/[0.08] px-6 py-5 text-left">
+        <DialogHeader className="gap-3 border-b border-white/8 px-6 py-5 text-left">
           <div className="flex flex-wrap items-center gap-2 pr-8">
             <Badge
               variant="outline"
-              className="border-white/15 bg-white/[0.04] font-mono text-[0.7rem] text-muted-foreground"
+              className="border-white/15 bg-white/4 font-mono text-[0.7rem] text-muted-foreground"
             >
               {formatBoardCaseId(caseItem)}
             </Badge>
@@ -156,7 +166,7 @@ export function CaseDetailModal({
                   }
                   disabled={reassignMut.isPending}
                 >
-                  <SelectTrigger className="h-9 border-white/10 bg-white/[0.04]">
+                  <SelectTrigger className="h-9 border-white/10 bg-white/4">
                     <div className="flex items-center gap-2">
                       <UserRound className="size-4 text-muted-foreground" />
                       <SelectValue placeholder="Unassigned" />
@@ -181,6 +191,11 @@ export function CaseDetailModal({
                     {assignee.lastName}.
                   </p>
                 )}
+                {!assignee && caseItem.assignedExaminer ? (
+                  <p className="text-xs text-muted-foreground">
+                    Currently assigned to {caseItem.assignedExaminer}.
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-2">
@@ -197,7 +212,7 @@ export function CaseDetailModal({
                   }
                   disabled={updateStatusMut.isPending}
                 >
-                  <SelectTrigger className="h-9 border-white/10 bg-white/[0.04]">
+                  <SelectTrigger className="h-9 border-white/10 bg-white/4">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -211,7 +226,31 @@ export function CaseDetailModal({
               </div>
             </div>
 
-            <Separator className="bg-white/[0.08]" />
+            <Separator className="bg-white/8" />
+
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              {caseDetails.map(([label, value]) => (
+                <div key={label} className="rounded-lg bg-white/3 p-3">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {label}
+                  </Label>
+                  <p className="mt-1 text-foreground">{value || "Not set"}</p>
+                </div>
+              ))}
+            </div>
+
+            {caseItem.description ? (
+              <div className="rounded-lg bg-white/3 p-3">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Description
+                </Label>
+                <p className="mt-1 text-sm text-foreground">
+                  {caseItem.description}
+                </p>
+              </div>
+            ) : null}
+
+            <Separator className="bg-white/8" />
 
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
@@ -230,7 +269,7 @@ export function CaseDetailModal({
                   "flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors",
                   isDragging
                     ? "border-[hsl(213_94%_55%/0.65)] bg-[hsl(213_94%_55%/0.08)]"
-                    : "border-white/15 bg-white/[0.02] hover:border-white/25 hover:bg-white/[0.04]",
+                    : "border-white/15 bg-white/2 hover:border-white/25 hover:bg-white/4",
                 )}
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
@@ -278,7 +317,7 @@ export function CaseDetailModal({
                   Loading files…
                 </div>
               ) : attachments.length === 0 ? (
-                <p className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-muted-foreground">
+                <p className="rounded-lg border border-white/6 bg-white/2 px-4 py-3 text-sm text-muted-foreground">
                   No files uploaded to this case yet.
                 </p>
               ) : (
@@ -288,7 +327,7 @@ export function CaseDetailModal({
                     return (
                       <li
                         key={key}
-                        className="flex items-center gap-3 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5"
+                        className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/3 px-3 py-2.5"
                       >
                         <FileIcon className="size-4 shrink-0 text-muted-foreground" />
                         <div className="min-w-0 flex-1">

@@ -17,10 +17,16 @@ import {
   reassignCase,
   updateCaseStatus,
 } from "@/lib/case-api";
+import {
+  type CreateEvidenceFormInput,
+  createEvidence,
+  listEvidence,
+} from "@/lib/evidence-api";
 import type { CaseAttachment } from "@/lib/types/case-types";
 
 const keys = {
   cases: ["cases"] as const,
+  evidence: ["evidence"] as const,
   attachments: ["case-attachments"] as const,
 };
 
@@ -37,6 +43,23 @@ export function useCreateCase() {
     mutationFn: (input: CreateCaseFormInput) => createCase(input),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: keys.cases });
+    },
+  });
+}
+
+export function useEvidence() {
+  return useQuery({
+    queryKey: keys.evidence,
+    queryFn: listEvidence,
+  });
+}
+
+export function useCreateEvidence() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateEvidenceFormInput) => createEvidence(input),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: keys.evidence });
     },
   });
 }

@@ -1,10 +1,10 @@
 import {
   type Case,
   type CaseAttachment,
+  type CasePriority,
   type CaseStatus,
   caseSchema,
   caseStatusSchema,
-  type CreateCaseInput,
 } from "@/lib/types/case-types";
 import {
   assigneeIdSchema,
@@ -12,7 +12,7 @@ import {
   MOCK_CREATED_BY,
 } from "@/lib/mocks";
 
-const STORAGE_KEY = "casecipher:cases:v3";
+const STORAGE_KEY = "casecipher:cases:v4";
 
 function nowIso() {
   return new Date().toISOString();
@@ -62,14 +62,18 @@ export async function listCases(): Promise<Case[]> {
 
 /** Form-friendly create input (maps to DB `CreateCaseInput` in `createCase`). */
 export type CreateCaseFormInput = {
-  title: string;
-  client: string;
+  caseNumber?: string;
+  caseName: string;
   description?: string;
   status: CaseStatus;
-  assignedTo: string;
-  priority?: CreateCaseInput["priority"];
-  incidentDate?: string;
-  incidentTime?: string;
+  priority: CasePriority;
+  caseType?: string;
+  requestor?: string;
+  assignedExaminer?: string;
+  subjectName?: string;
+  department?: string;
+  dateReceived?: string;
+  dateDue?: string;
   attachments?: CaseAttachment[];
 };
 
@@ -86,24 +90,25 @@ export async function createCase(input: CreateCaseFormInput): Promise<Case> {
   await new Promise((r) => setTimeout(r, 250));
   const items = readAll();
   const t = nowIso();
-  const description = [
-    input.client.trim() ? `Client: ${input.client.trim()}.` : "",
-    input.description?.trim() ?? "",
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   const newItem: Case = {
     id: crypto.randomUUID(),
-    caseNumber: makeCaseNumber(items),
-    title: input.title.trim(),
+    caseNumber: input.caseNumber?.trim() || makeCaseNumber(items),
+    title: input.caseName.trim(),
     clientId: null,
-    description: description || null,
+    caseType: input.caseType?.trim() || null,
+    requestor: input.requestor?.trim() || null,
+    assignedExaminer: input.assignedExaminer?.trim() || null,
+    subjectName: input.subjectName?.trim() || null,
+    department: input.department?.trim() || null,
+    dateReceived: input.dateReceived ?? null,
+    dateDue: input.dateDue ?? null,
+    description: input.description?.trim() || null,
     status: input.status,
-    assignedTo: input.assignedTo || null,
-    priority: input.priority ?? "medium",
-    incidentDate: input.incidentDate ?? null,
-    incidentTime: input.incidentTime ?? null,
+    assignedTo: null,
+    priority: input.priority,
+    incidentDate: null,
+    incidentTime: null,
     createdBy: MOCK_CREATED_BY,
     createdAt: t,
     updatedAt: t,

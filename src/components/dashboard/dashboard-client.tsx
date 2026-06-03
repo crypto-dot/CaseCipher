@@ -56,6 +56,7 @@ function columnForCase(status: CaseStatus): BoardColumnId {
 function formatBoardCaseId(c: Case) {
   const source = c.caseNumber ?? c.id;
   const match = /^CASE-(\d+)$/i.exec(source.trim());
+  if (!match && c.caseNumber) return c.caseNumber;
   const n = match ? Number.parseInt(match[1], 10) : 0;
   const yy = new Date(c.createdAt).getFullYear().toString().slice(-2);
   const seq = Number.isFinite(n) ? n : 0;
@@ -70,6 +71,8 @@ function lastActivityLabel(iso: string) {
 }
 
 function caseCategoryLabel(c: Case) {
+  if (c.caseType) return c.caseType;
+  if (c.requestor) return c.requestor;
   const t = c.title.trim();
   const colon = t.indexOf(":");
   if (colon > 0 && colon < 24) return t.slice(0, colon).trim();
@@ -128,7 +131,7 @@ export function DashboardClient() {
           <Button
             variant="outline"
             size="sm"
-            className="border-white/15 bg-white/[0.04] text-foreground shadow-none hover:bg-white/[0.07]"
+            className="border-white/15 bg-white/4 text-foreground shadow-none hover:bg-white/[0.07]"
             onClick={() => casesQuery.refetch()}
             disabled={casesQuery.isFetching}
             aria-label="Refresh cases"
@@ -174,10 +177,10 @@ export function DashboardClient() {
               return (
                 <section
                   key={col.id}
-                  className="case-board-column flex-1 flex h-full max-h-full min-h-0 w-[17.5rem] shrink-0 flex-col rounded-2xl border border-white/[0.08] bg-[hsl(222_44%_8%/0.65)] shadow-[inset_0_1px_0_hsl(210_40%_96%/0.04)]"
+                  className="case-board-column flex-1 flex h-full max-h-full min-h-0 w-70 shrink-0 flex-col rounded-2xl border border-white/8 bg-[hsl(222_44%_8%/0.65)] shadow-[inset_0_1px_0_hsl(210_40%_96%/0.04)]"
                   aria-label={col.label}
                 >
-                  <div className="case-board-column-head flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] px-3 py-3">
+                  <div className="case-board-column-head flex shrink-0 items-center justify-between gap-2 border-b border-white/8 px-3 py-3">
                     <div className="flex min-w-0 items-center gap-2">
                       <span
                         className={cn(
@@ -191,7 +194,7 @@ export function DashboardClient() {
                       </h2>
                     </div>
                     <output
-                      className="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-medium text-foreground"
+                      className="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/4 text-xs font-medium text-foreground"
                       aria-label={`${list.length} cases in ${col.label}`}
                     >
                       {list.length}
@@ -200,7 +203,7 @@ export function DashboardClient() {
 
                   <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
                     {list.length === 0 ? (
-                      <p className="flex min-h-[12rem] flex-1 items-center justify-center py-6 text-center text-sm text-muted-foreground/70">
+                      <p className="flex min-h-48 flex-1 items-center justify-center py-6 text-center text-sm text-muted-foreground/70">
                         No cases
                       </p>
                     ) : (
@@ -209,7 +212,7 @@ export function DashboardClient() {
                         return (
                           <article
                             key={c.id}
-                            className="case-board-card group cursor-pointer rounded-xl border border-white/[0.1] bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
+                            className="case-board-card group cursor-pointer rounded-xl border border-white/10 bg-[hsl(222_43%_11%/0.95)] p-3.5 shadow-[0_12px_32px_hsl(222_70%_3%/0.35)] transition-[border-color,box-shadow] hover:border-[hsl(213_94%_55%/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(213_94%_55%/0.45)]"
                             onClick={() => setSelectedCaseId(c.id)}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" || e.key === " ") {
@@ -251,7 +254,9 @@ export function DashboardClient() {
                                 />
                                 <span className="truncate">
                                   {getAssigneeById(c.assignedTo ?? "")
-                                    ?.firstName ?? "Unassigned"}
+                                    ?.firstName ??
+                                    c.assignedExaminer ??
+                                    "Unassigned"}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
@@ -274,11 +279,8 @@ export function DashboardClient() {
                               {lastActivityLabel(c.updatedAt)}
                             </div>
 
-                            <button
-                              className="mt-3 grid gap-2 border-t border-white/[0.06] pt-3"
-                              onClick={(e) => e.stopPropagation()}
-                              onKeyDown={(e) => e.stopPropagation()}
-                              type="button"
+                            <div
+                              className="mt-3 grid gap-2 border-t border-white/6 pt-3"
                             >
                               <div className="grid grid-cols-1 gap-1.5">
                                 <span className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
@@ -291,7 +293,7 @@ export function DashboardClient() {
                                   }
                                   disabled={reassignMut.isPending}
                                 >
-                                  <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
+                                  <SelectTrigger className="h-8 border-white/10 bg-white/4 text-xs">
                                     <SelectValue placeholder="Select" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -320,7 +322,7 @@ export function DashboardClient() {
                                   }
                                   disabled={updateStatusMut.isPending}
                                 >
-                                  <SelectTrigger className="h-8 border-white/10 bg-white/[0.04] text-xs">
+                                  <SelectTrigger className="h-8 border-white/10 bg-white/4 text-xs">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -332,7 +334,7 @@ export function DashboardClient() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                            </button>
+                            </div>
                           </article>
                         );
                       })

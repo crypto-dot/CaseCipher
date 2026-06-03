@@ -50,25 +50,29 @@ export default function CasesListPage() {
           .
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-white/[0.08] bg-[hsl(222_44%_8%/0.65)]">
-          <table className="w-full min-w-[36rem] text-left text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-white/8 bg-[hsl(222_44%_8%/0.65)]">
+          <table className="w-full min-w-xl text-left text-sm">
             <thead>
-              <tr className="border-b border-white/[0.08] text-xs uppercase tracking-wide text-muted-foreground">
+              <tr className="border-b border-white/8 text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="px-4 py-3 font-medium">ID</th>
-                <th className="px-4 py-3 font-medium">Title</th>
+                <th className="px-4 py-3 font-medium">Case name</th>
+                <th className="px-4 py-3 font-medium">Case type</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Assignee</th>
                 <th className="px-4 py-3 font-medium">Updated</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-white/6">
               {cases.map((c) => (
                 <tr key={c.id} className="text-foreground/95">
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {c.id}
+                    {c.caseNumber ?? c.id}
                   </td>
-                  <td className="max-w-[14rem] truncate px-4 py-3 font-medium">
+                  <td className="max-w-56 truncate px-4 py-3 font-medium">
                     {c.title}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {c.caseType ?? "General"}
                   </td>
                   <td className="px-4 py-3">
                     <Badge
@@ -84,7 +88,7 @@ export default function CasesListPage() {
                   <td className="px-4 py-3 text-muted-foreground">
                     {c.assignedTo
                       ? getAssigneeNameById(c.assignedTo)
-                      : "Unassigned"}
+                      : (c.assignedExaminer ?? "Unassigned")}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(c.updatedAt).toLocaleString()}

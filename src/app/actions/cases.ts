@@ -53,7 +53,15 @@ export async function createCase(
 ) {
   const newCase = createCaseSchema.parse({
     ...input,
+    caseNumber: input.caseNumber?.trim() || null,
     clientId: input.clientId ?? null,
+    caseType: input.caseType?.trim() || null,
+    requestor: input.requestor?.trim() || null,
+    assignedExaminer: input.assignedExaminer?.trim() || null,
+    subjectName: input.subjectName?.trim() || null,
+    department: input.department?.trim() || null,
+    dateReceived: input.dateReceived ?? null,
+    dateDue: input.dateDue ?? null,
     description: input.description ?? null,
     status: input.status ?? "new_case",
     priority: input.priority ?? "medium",

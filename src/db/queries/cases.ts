@@ -166,7 +166,7 @@ export async function generateCaseNumber(): Promise<string> {
  * Create a new case
  */
 export async function createCase(data: NewCase): Promise<Case> {
-  const caseNumber = await generateCaseNumber();
+  const caseNumber = data.caseNumber ?? (await generateCaseNumber());
 
   const result = await db
     .insert(cases)
