@@ -32,10 +32,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  CASE_NUMBERING_RULES,
+  DEFAULT_CASE_NUMBERING_RULE,
+  DEFAULT_EVIDENCE_NUMBERING_RULE,
+  EVIDENCE_NUMBERING_RULES,
   formatNumberingRule,
   normalizeNumberingRule,
   numberingSettingsSchema,
-  POPULAR_NUMBERING_RULES,
   readNumberingSettings,
   writeNumberingSettings,
 } from "@/lib/numbering-settings";
@@ -48,7 +51,11 @@ type RuleOption = {
   description?: string;
 };
 
-function buildRuleOptions(customRules: string[], currentRules: string[]) {
+function buildRuleOptions(
+  defaultRules: readonly RuleOption[],
+  customRules: string[],
+  currentRules: string[],
+) {
   const customOptions = customRules.map((rule) => ({
     value: rule,
     label: "Custom rule",
@@ -65,9 +72,10 @@ function buildRuleOptions(customRules: string[], currentRules: string[]) {
 
   return Array.from(
     new Map(
-      [...POPULAR_NUMBERING_RULES, ...customOptions, ...currentOptions].map(
-        (option) => [option.value, option],
-      ),
+      [...defaultRules, ...customOptions, ...currentOptions].map((option) => [
+        option.value,
+        option,
+      ]),
     ).values(),
   );
 }
@@ -133,7 +141,7 @@ function NumberingRuleCombobox({
             </>
           ) : null}
           <ComboboxEmpty>
-            Type a rule like CASE-YYYY-MM, then save it as a custom option.
+            Type a rule like CASE-YYYY-MM-####, then save it as a custom option.
           </ComboboxEmpty>
         </ComboboxList>
       </ComboboxContent>
@@ -148,8 +156,8 @@ export default function SettingsPage() {
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(numberingSettingsSchema),
     defaultValues: {
-      caseNumberingRule: "CASE-YYYY-MM",
-      evidenceNumberingRule: "EVD-YYYY-MM",
+      caseNumberingRule: DEFAULT_CASE_NUMBERING_RULE,
+      evidenceNumberingRule: DEFAULT_EVIDENCE_NUMBERING_RULE,
     },
     mode: "onChange",
   });
@@ -165,9 +173,14 @@ export default function SettingsPage() {
 
   const caseRule = form.watch("caseNumberingRule");
   const evidenceRule = form.watch("evidenceNumberingRule");
-  const options = React.useMemo(
-    () => buildRuleOptions(customRules, [caseRule, evidenceRule]),
-    [caseRule, customRules, evidenceRule],
+  const caseOptions = React.useMemo(
+    () => buildRuleOptions(CASE_NUMBERING_RULES, customRules, [caseRule]),
+    [caseRule, customRules],
+  );
+  const evidenceOptions = React.useMemo(
+    () =>
+      buildRuleOptions(EVIDENCE_NUMBERING_RULES, customRules, [evidenceRule]),
+    [customRules, evidenceRule],
   );
 
   function onSubmit(values: SettingsFormValues) {
@@ -186,8 +199,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Choose how new cases and evidence are numbered when you leave the
-          number field blank.
+          Choose how new case and evidence identifiers are generated.
         </p>
       </div>
 
@@ -195,9 +207,9 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Numbering rules</CardTitle>
           <CardDescription>
-            Popular formats use an agency or item prefix, a year token, and a
-            month token. New custom rules are saved into the combobox after you
-            submit them.
+            Popular formats use a matter, party, agency, or item prefix with a
+            date bucket and a four-digit sequence. New custom rules are saved
+            into the combobox after you submit them.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,8 +227,8 @@ export default function SettingsPage() {
                           field.onChange(normalizeNumberingRule(nextValue));
                           setSaved(false);
                         }}
-                        options={options}
-                        placeholder="Search or enter CASE-YYYY-MM"
+                        options={caseOptions}
+                        placeholder={`Search or enter ${DEFAULT_CASE_NUMBERING_RULE}`}
                         value={field.value}
                       />
                       <FormDescription>
@@ -238,8 +250,8 @@ export default function SettingsPage() {
                           field.onChange(normalizeNumberingRule(nextValue));
                           setSaved(false);
                         }}
-                        options={options}
-                        placeholder="Search or enter EVD-YYYY-MM"
+                        options={evidenceOptions}
+                        placeholder={`Search or enter ${DEFAULT_EVIDENCE_NUMBERING_RULE}`}
                         value={field.value}
                       />
                       <FormDescription>
@@ -252,13 +264,16 @@ export default function SettingsPage() {
               </div>
 
               <div className="rounded-xl border border-white/8 bg-white/3 p-4 text-sm text-muted-foreground">
-                Rules can use one literal text segment, one year token
-                <span className="font-medium text-foreground"> YYYY or YY</span>
-                , one month token
-                <span className="font-medium text-foreground"> MM or M</span>,
-                and single separators
+                Rules can use literal text, date tokens
+                <span className="font-medium text-foreground">
+                  {" "}
+                  YYYY, YY, MM, or M
+                </span>
+                , single separators
                 <span className="font-medium text-foreground"> -, /, or _</span>
-                . Examples: CASE-YYYY-MM, YYYY-MM-CASE, YY_M_EVD.
+                , and must end in
+                <span className="font-medium text-foreground"> ####</span>.
+                Examples: YYYY-####, LIT-YYYY-####, BATES-YYYY-MM-####.
               </div>
 
               <div className="flex items-center justify-between gap-3">

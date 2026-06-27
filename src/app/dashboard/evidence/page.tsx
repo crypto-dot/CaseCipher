@@ -38,7 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCases, useCreateEvidence, useEvidence } from "@/lib/case-hooks";
 import {
   DEFAULT_EVIDENCE_NUMBERING_RULE,
-  formatNumberingRule,
+  previewNextNumber,
   readNumberingSettings,
 } from "@/lib/numbering-settings";
 import type { Case } from "@/lib/types/case-types";
@@ -118,13 +118,13 @@ export default function EvidencePage() {
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState(ALL_STATUSES);
   const [typeFilter, setTypeFilter] = React.useState(ALL_TYPES);
-  const [defaultEvidenceNumber, setDefaultEvidenceNumber] = React.useState(() =>
-    formatNumberingRule(DEFAULT_EVIDENCE_NUMBERING_RULE),
+  const [evidenceNumberingRule, setEvidenceNumberingRule] = React.useState(
+    DEFAULT_EVIDENCE_NUMBERING_RULE,
   );
 
   React.useEffect(() => {
     const { evidenceNumberingRule } = readNumberingSettings();
-    setDefaultEvidenceNumber(formatNumberingRule(evidenceNumberingRule));
+    setEvidenceNumberingRule(evidenceNumberingRule);
   }, []);
 
   const casesQuery = useCases();
@@ -133,6 +133,18 @@ export default function EvidencePage() {
 
   const cases = casesQuery.data ?? [];
   const evidence = evidenceQuery.data ?? [];
+  const defaultEvidenceNumber = React.useMemo(
+    () =>
+      previewNextNumber(
+        evidenceNumberingRule,
+        evidence
+          .map((item) => item.evidenceNumber)
+          .filter((evidenceNumber): evidenceNumber is string =>
+            Boolean(evidenceNumber),
+          ),
+      ),
+    [evidence, evidenceNumberingRule],
+  );
   const caseById = React.useMemo(
     () => new Map(cases.map((caseItem) => [caseItem.id, caseItem])),
     [cases],
@@ -192,7 +204,7 @@ export default function EvidencePage() {
   async function onSubmit(values: EvidenceFormValues) {
     await createEvidenceMut.mutateAsync({
       caseId: values.caseId,
-      evidenceNumber: values.evidenceNumber || undefined,
+      evidenceNumber: undefined,
       dateSeized: values.dateSeized,
       evidenceType: values.evidenceType,
       status: values.status,
@@ -426,10 +438,15 @@ export default function EvidencePage() {
                       <FormItem>
                         <FormLabel>Evidence number</FormLabel>
                         <FormControl>
-                          <Input placeholder="EVD-00009" {...field} />
+                          <Input
+                            {...field}
+                            disabled
+                            value={defaultEvidenceNumber}
+                            className="bg-muted/50 text-muted-foreground"
+                          />
                         </FormControl>
                         <FormDescription>
-                          Leave blank to use {defaultEvidenceNumber}.
+                          Generated from the numbering rule in Settings.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

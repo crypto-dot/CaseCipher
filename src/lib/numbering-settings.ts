@@ -2,48 +2,77 @@ import { z } from "zod";
 
 const SETTINGS_KEY = "casecipher:numbering-settings:v1";
 
-export const DEFAULT_CASE_NUMBERING_RULE = "CASE-YYYY-MM";
-export const DEFAULT_EVIDENCE_NUMBERING_RULE = "EVD-YYYY-MM";
+export const DEFAULT_CASE_NUMBERING_RULE = "YYYY-####";
+export const DEFAULT_EVIDENCE_NUMBERING_RULE = "BATES-YYYY-MM-####";
 
-export const POPULAR_NUMBERING_RULES = [
+export const CASE_NUMBERING_RULES = [
   {
-    value: "CASE-YYYY-MM",
-    label: "Agency prefix, year, month",
-    description: "Common for internal case queues and monthly intake batches.",
+    value: "YYYY-####",
+    label: "Year plus sequence",
+    description: "Simple, common default such as 2026-0042.",
   },
   {
-    value: "YYYY-MM-CASE",
-    label: "Date first, agency prefix",
-    description: "Sorts naturally by year and month before the case type.",
+    value: "YY-####",
+    label: "Short year plus sequence",
+    description: "Compact incident-style numbering such as 26-0042.",
   },
   {
-    value: "YY-M-CASE",
-    label: "Compact date first",
-    description: "Short year and month for teams with shorter identifiers.",
+    value: "LIT-YYYY-####",
+    label: "Type prefix, year, sequence",
+    description: "Practice-area or matter type prefix such as LIT-2026-0042.",
   },
   {
-    value: "CASE_YYYY_MM",
-    label: "Underscore-separated",
-    description: "Useful for file-system friendly case folders.",
+    value: "CLIENT-YYYY-####",
+    label: "Client-matter style",
+    description: "Client or matter prefix with a matter sequence.",
   },
   {
-    value: "YYYY/MM/CASE",
-    label: "Slash-separated date first",
-    description: "Follows many document-control date conventions.",
-  },
-  {
-    value: "EVD-YYYY-MM",
-    label: "Evidence prefix, year, month",
-    description: "Matches evidence-label workflows with a clear item prefix.",
+    value: "AGENCY-YY-####",
+    label: "Law enforcement incident style",
+    description: "Agency prefix, short year, and incident sequence.",
   },
 ] as const;
 
+export const EVIDENCE_NUMBERING_RULES = [
+  {
+    value: "BATES-YYYY-MM-####",
+    label: "Bates numbering",
+    description: "Producing-party prefix plus zero-padded sequence.",
+  },
+  {
+    value: "SMITH-YYYY-MM-####",
+    label: "Bates party prefix",
+    description: "Producing-party prefix with a fixed-width sequence.",
+  },
+  {
+    value: "P-YYYY-####",
+    label: "Plaintiff exhibit style",
+    description: "Party-prefixed exhibit numbering with filing year.",
+  },
+  {
+    value: "EVD-YYYY-MM-####",
+    label: "Evidence item style",
+    description: "Evidence prefix, date bucket, and item sequence.",
+  },
+  {
+    value: "ABC-YYYY-MM-####",
+    label: "Forensic exhibit reference",
+    description: "Examiner or officer initials plus sequence.",
+  },
+] as const;
+
+export const POPULAR_NUMBERING_RULES = [
+  ...CASE_NUMBERING_RULES,
+  ...EVIDENCE_NUMBERING_RULES,
+] as const;
+
 const ALLOWED_RULE_REGEX =
-  /^(?!.*[-_/]{2})(?:YYYY|YY|MM|M|[A-Z][A-Z0-9]*)(?:[-_/](?:YYYY|YY|MM|M|[A-Z][A-Z0-9]*))*$/i;
+  /^(?!.*[-_/]{2})(?:YYYY|YY|MM|M|#+|[A-Z0-9]+)(?:[-_/](?:YYYY|YY|MM|M|#+|[A-Z0-9]+))*$/i;
 const DUPLICATE_YEAR_TOKEN_REGEX =
   /(?:^|[-_/])(YYYY|YY)(?=$|[-_/]).*(?:^|[-_/])\1(?=$|[-_/])/i;
 const DUPLICATE_MONTH_TOKEN_REGEX =
   /(?:^|[-_/])(MM|M)(?=$|[-_/]).*(?:^|[-_/])\1(?=$|[-_/])/i;
+const SEQUENCE_TOKEN_REGEX = /(?:^|[-_/])(#{4})(?=$)/;
 
 type NumberingSettings = {
   caseNumberingRule: string;
@@ -69,15 +98,25 @@ export function isValidNumberingRule(rule: string) {
   if (!ALLOWED_RULE_REGEX.test(normalized)) return false;
   if (DUPLICATE_YEAR_TOKEN_REGEX.test(normalized)) return false;
   if (DUPLICATE_MONTH_TOKEN_REGEX.test(normalized)) return false;
+  if (!SEQUENCE_TOKEN_REGEX.test(normalized)) return false;
 
   const tokens = normalized.split(/[-_/]/);
-  const hasYear = tokens.some((token) => token === "YYYY" || token === "YY");
-  const hasMonth = tokens.some((token) => token === "MM" || token === "M");
-  const hasLiteral = tokens.some(
-    (token) => !["YYYY", "YY", "MM", "M"].includes(token),
-  );
+  const yearTokenCount = tokens.filter(
+    (token) => token === "YYYY" || token === "YY",
+  ).length;
+  const monthTokenCount = tokens.filter(
+    (token) => token === "MM" || token === "M",
+  ).length;
+  const sequenceTokenCount = tokens.filter((token) =>
+    /^#{4}$/.test(token),
+  ).length;
 
-  return hasYear && hasMonth && hasLiteral;
+  return (
+    yearTokenCount + monthTokenCount > 0 &&
+    yearTokenCount <= 1 &&
+    monthTokenCount <= 1 &&
+    sequenceTokenCount === 1
+  );
 }
 
 export const numberingRuleSchema = z
@@ -88,7 +127,7 @@ export const numberingRuleSchema = z
   .transform(normalizeNumberingRule)
   .refine(isValidNumberingRule, {
     message:
-      "Use one text segment, one year token (YYYY or YY), one month token (MM or M), and single -, /, or _ separators.",
+      "Use a date token (YYYY, YY, MM, or M), single -, /, or _ separators, and end with ####.",
   });
 
 export const numberingSettingsSchema = z.object({
@@ -160,7 +199,11 @@ export function writeNumberingSettings(
   );
 }
 
-export function formatNumberingRule(rule: string, date = new Date()) {
+export function formatNumberingRule(
+  rule: string,
+  sequence = 1,
+  date = new Date(),
+) {
   const year = String(date.getFullYear());
   const shortYear = year.slice(-2);
   const month = String(date.getMonth() + 1);
@@ -179,7 +222,9 @@ export function formatNumberingRule(rule: string, date = new Date()) {
         case "M":
           return month;
         default:
-          return token;
+          return /^#{4}$/.test(token)
+            ? String(sequence).padStart(token.length, "0")
+            : token;
       }
     })
     .join("");
@@ -189,19 +234,28 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function makeUniqueNumber(
-  baseNumber: string,
+export function makeNextNumber(
+  rule: string,
   existingNumbers: string[],
+  date = new Date(),
 ) {
-  if (!existingNumbers.includes(baseNumber)) return baseNumber;
-
-  const suffixRegex = new RegExp(`^${escapeRegExp(baseNumber)}-(\\d+)$`, "i");
+  const basePattern = formatNumberingRule(rule, 0, date).replace(/0{4,}$/, "");
+  const sequenceRegex = new RegExp(`^${escapeRegExp(basePattern)}(\\d+)$`, "i");
   const next =
     existingNumbers
-      .map((number) => suffixRegex.exec(number)?.[1])
+      .map((number) => sequenceRegex.exec(number)?.[1])
       .map((value) => (value ? Number.parseInt(value, 10) : Number.NaN))
       .filter(Number.isFinite)
-      .reduce((max, value) => Math.max(max, value), 1) + 1;
+      .reduce((max, value) => Math.max(max, value), 0) + 1;
 
-  return `${baseNumber}-${String(next).padStart(2, "0")}`;
+  return formatNumberingRule(rule, next, date);
+}
+
+export function previewNextNumber(
+  rule: string,
+  existingNumbers: string[],
+  date = new Date(),
+) {
+  if (!isValidNumberingRule(rule)) return "";
+  return makeNextNumber(rule, existingNumbers, date);
 }

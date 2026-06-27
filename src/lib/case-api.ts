@@ -4,8 +4,7 @@ import {
   MOCK_CREATED_BY,
 } from "@/lib/mocks";
 import {
-  formatNumberingRule,
-  makeUniqueNumber,
+  makeNextNumber,
   readNumberingSettings,
 } from "@/lib/numbering-settings";
 import {
@@ -84,9 +83,8 @@ export type CreateCaseFormInput = {
 
 function makeCaseNumber(existing: Case[]) {
   const { caseNumberingRule } = readNumberingSettings();
-  const baseNumber = formatNumberingRule(caseNumberingRule);
-  return makeUniqueNumber(
-    baseNumber,
+  return makeNextNumber(
+    caseNumberingRule,
     existing
       .map((caseItem) => caseItem.caseNumber)
       .filter((caseNumber): caseNumber is string => Boolean(caseNumber)),

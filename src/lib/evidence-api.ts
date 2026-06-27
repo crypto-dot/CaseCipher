@@ -1,7 +1,6 @@
 import { mockEvidence } from "@/lib/mocks/evidence";
 import {
-  formatNumberingRule,
-  makeUniqueNumber,
+  makeNextNumber,
   readNumberingSettings,
 } from "@/lib/numbering-settings";
 import {
@@ -51,9 +50,8 @@ function writeAll(items: EvidenceItem[]) {
 
 function nextEvidenceNumber(items: EvidenceItem[]) {
   const { evidenceNumberingRule } = readNumberingSettings();
-  const baseNumber = formatNumberingRule(evidenceNumberingRule);
-  return makeUniqueNumber(
-    baseNumber,
+  return makeNextNumber(
+    evidenceNumberingRule,
     items
       .map((item) => item.evidenceNumber)
       .filter((evidenceNumber): evidenceNumber is string =>

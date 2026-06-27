@@ -33,10 +33,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateCase } from "@/lib/case-hooks";
+import { useCases, useCreateCase } from "@/lib/case-hooks";
 import {
   DEFAULT_CASE_NUMBERING_RULE,
-  formatNumberingRule,
+  previewNextNumber,
   readNumberingSettings,
 } from "@/lib/numbering-settings";
 import {
@@ -85,15 +85,27 @@ function titleCase(value: string) {
 
 export default function NewCasePage() {
   const router = useRouter();
+  const casesQuery = useCases();
   const createCaseMut = useCreateCase();
-  const [defaultCaseNumber, setDefaultCaseNumber] = React.useState(() =>
-    formatNumberingRule(DEFAULT_CASE_NUMBERING_RULE),
+  const [caseNumberingRule, setCaseNumberingRule] = React.useState(
+    DEFAULT_CASE_NUMBERING_RULE,
   );
 
   React.useEffect(() => {
     const { caseNumberingRule } = readNumberingSettings();
-    setDefaultCaseNumber(formatNumberingRule(caseNumberingRule));
+    setCaseNumberingRule(caseNumberingRule);
   }, []);
+
+  const defaultCaseNumber = React.useMemo(
+    () =>
+      previewNextNumber(
+        caseNumberingRule,
+        (casesQuery.data ?? [])
+          .map((caseItem) => caseItem.caseNumber)
+          .filter((caseNumber): caseNumber is string => Boolean(caseNumber)),
+      ),
+    [caseNumberingRule, casesQuery.data],
+  );
 
   const form = useForm<NewCaseTypes>({
     resolver: zodResolver(newCaseSchema),
@@ -116,7 +128,7 @@ export default function NewCasePage() {
 
   async function onSubmit(values: NewCaseTypes) {
     await createCaseMut.mutateAsync({
-      caseNumber: values.caseNumber,
+      caseNumber: undefined,
       caseName: values.caseName,
       description: values.description || undefined,
       status: values.status,
@@ -161,10 +173,15 @@ export default function NewCasePage() {
                     <FormItem>
                       <FormLabel>Case number</FormLabel>
                       <FormControl>
-                        <Input placeholder="CSE-26-0545" {...field} />
+                        <Input
+                          {...field}
+                          disabled
+                          value={defaultCaseNumber}
+                          className="bg-muted/50 text-muted-foreground"
+                        />
                       </FormControl>
                       <FormDescription>
-                        Leave blank to use {defaultCaseNumber}.
+                        Generated from the numbering rule in Settings.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
