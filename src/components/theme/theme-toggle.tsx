@@ -1,5 +1,4 @@
 "use client";
-
 import { Moon, Sun } from "lucide-react";
 import * as React from "react";
 
@@ -38,10 +37,9 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={toggle}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Light mode" : "Dark mode"}
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
-      {isDark ? <Sun /> : <Moon />}
+      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </Button>
   );
 }

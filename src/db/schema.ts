@@ -1,21 +1,21 @@
+import { sql } from "drizzle-orm";
 import {
-  pgTable,
-  pgSchema,
-  index,
+  boolean,
+  date,
   foreignKey,
-  uuid,
+  index,
+  jsonb,
+  pgEnum,
+  pgSchema,
+  pgTable,
   text,
+  time,
   timestamp,
   unique,
-  boolean,
   uniqueIndex,
-  jsonb,
-  date,
-  time,
+  uuid,
   varchar,
-  pgEnum,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 const neonAuth = pgSchema("neon_auth");
 export const casePriority = pgEnum("case_priority", ["low", "medium", "high"]);
@@ -396,14 +396,15 @@ export const evidence = pgTable(
     seizedBy: varchar("seized_by", { length: 120 }),
     acquisitionMethod: varchar("acquisition_method", { length: 50 }),
     acquisitionTool: varchar("acquisition_tool", { length: 120 }),
-    media: jsonb().$type<
-      Array<{
-        name: string;
-        size: number;
-        type: string;
-        lastModified: number;
-      }>
-    >(),
+    media:
+      jsonb().$type<
+        Array<{
+          name: string;
+          size: number;
+          type: string;
+          lastModified: number;
+        }>
+      >(),
     collectedAt: timestamp("collected_at", {
       withTimezone: true,
       mode: "string",

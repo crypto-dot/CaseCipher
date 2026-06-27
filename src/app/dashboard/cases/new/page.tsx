@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,6 +18,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,6 +34,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateCase } from "@/lib/case-hooks";
+import {
+  DEFAULT_CASE_NUMBERING_RULE,
+  formatNumberingRule,
+  readNumberingSettings,
+} from "@/lib/numbering-settings";
 import {
   casePrioritySchema,
   caseStatusLabel,
@@ -79,6 +86,14 @@ function titleCase(value: string) {
 export default function NewCasePage() {
   const router = useRouter();
   const createCaseMut = useCreateCase();
+  const [defaultCaseNumber, setDefaultCaseNumber] = React.useState(() =>
+    formatNumberingRule(DEFAULT_CASE_NUMBERING_RULE),
+  );
+
+  React.useEffect(() => {
+    const { caseNumberingRule } = readNumberingSettings();
+    setDefaultCaseNumber(formatNumberingRule(caseNumberingRule));
+  }, []);
 
   const form = useForm<NewCaseTypes>({
     resolver: zodResolver(newCaseSchema),
@@ -148,6 +163,9 @@ export default function NewCasePage() {
                       <FormControl>
                         <Input placeholder="CSE-26-0545" {...field} />
                       </FormControl>
+                      <FormDescription>
+                        Leave blank to use {defaultCaseNumber}.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -262,7 +280,10 @@ export default function NewCasePage() {
                     <FormItem>
                       <FormLabel>Requestor</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. HR Department, Legal" {...field} />
+                        <Input
+                          placeholder="e.g. HR Department, Legal"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

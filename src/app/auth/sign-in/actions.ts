@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth/server";
 
 export async function signInWithEmail(
   _prevState: { error: string } | null,
@@ -16,5 +16,5 @@ export async function signInWithEmail(
     return { error: error.message || "Failed to sign in. Try again" };
   }
 
-  redirect("/");
+  redirect("/dashboard");
 }

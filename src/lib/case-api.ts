@@ -1,4 +1,14 @@
 import {
+  assigneeIdSchema,
+  createMockCases,
+  MOCK_CREATED_BY,
+} from "@/lib/mocks";
+import {
+  formatNumberingRule,
+  makeUniqueNumber,
+  readNumberingSettings,
+} from "@/lib/numbering-settings";
+import {
   type Case,
   type CaseAttachment,
   type CasePriority,
@@ -6,11 +16,6 @@ import {
   caseSchema,
   caseStatusSchema,
 } from "@/lib/types/case-types";
-import {
-  assigneeIdSchema,
-  createMockCases,
-  MOCK_CREATED_BY,
-} from "@/lib/mocks";
 
 const STORAGE_KEY = "casecipher:cases:v4";
 
@@ -78,12 +83,14 @@ export type CreateCaseFormInput = {
 };
 
 function makeCaseNumber(existing: Case[]) {
-  const numeric = existing
-    .map((c) => c.caseNumber && /^CASE-(\d+)$/i.exec(c.caseNumber)?.[1])
-    .map((m) => (m ? Number.parseInt(m, 10) : Number.NaN))
-    .filter((n) => Number.isFinite(n));
-  const next = (numeric.length ? Math.max(...numeric) : 1000) + 1;
-  return `CASE-${next}`;
+  const { caseNumberingRule } = readNumberingSettings();
+  const baseNumber = formatNumberingRule(caseNumberingRule);
+  return makeUniqueNumber(
+    baseNumber,
+    existing
+      .map((caseItem) => caseItem.caseNumber)
+      .filter((caseNumber): caseNumber is string => Boolean(caseNumber)),
+  );
 }
 
 export async function createCase(input: CreateCaseFormInput): Promise<Case> {

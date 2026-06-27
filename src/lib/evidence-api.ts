@@ -1,3 +1,9 @@
+import { mockEvidence } from "@/lib/mocks/evidence";
+import {
+  formatNumberingRule,
+  makeUniqueNumber,
+  readNumberingSettings,
+} from "@/lib/numbering-settings";
 import {
   type AcquisitionMethod,
   type EvidenceItem,
@@ -6,7 +12,6 @@ import {
   type EvidenceType,
   evidenceSchema,
 } from "@/lib/types/evidence-types";
-import { mockEvidence } from "@/lib/mocks/evidence";
 
 const STORAGE_KEY = "casecipher:evidence:v1";
 
@@ -45,13 +50,16 @@ function writeAll(items: EvidenceItem[]) {
 }
 
 function nextEvidenceNumber(items: EvidenceItem[]) {
-  const next =
+  const { evidenceNumberingRule } = readNumberingSettings();
+  const baseNumber = formatNumberingRule(evidenceNumberingRule);
+  return makeUniqueNumber(
+    baseNumber,
     items
-      .map((item) => item.evidenceNumber?.match(/^EVD-(\d+)$/i)?.[1])
-      .map((value) => (value ? Number.parseInt(value, 10) : Number.NaN))
-      .filter(Number.isFinite)
-      .reduce((max, value) => Math.max(max, value), 0) + 1;
-  return `EVD-${String(next).padStart(5, "0")}`;
+      .map((item) => item.evidenceNumber)
+      .filter((evidenceNumber): evidenceNumber is string =>
+        Boolean(evidenceNumber),
+      ),
+  );
 }
 
 function pseudoHash(seed: string, length: number) {

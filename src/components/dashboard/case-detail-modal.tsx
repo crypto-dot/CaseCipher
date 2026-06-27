@@ -26,7 +26,6 @@ import {
   formatFileSize,
   toAttachmentMeta,
 } from "@/lib/attachments";
-import { priorityLabel, priorityPillClass } from "@/lib/priority-colors";
 import {
   useAddCaseAttachments,
   useCaseAttachments,
@@ -35,6 +34,7 @@ import {
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
 import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
+import { priorityLabel, priorityPillClass } from "@/lib/priority-colors";
 import {
   type Case,
   type CaseStatus,
@@ -120,7 +120,7 @@ export function CaseDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[min(90vh,48rem)] gap-0 overflow-hidden rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 shadow-[0_24px_64px_hsl(222_70%_3%/0.55)] sm:max-w-xl"
+        className="max-h-[min(90vh,48rem)] gap-0 overflow-hidden rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 sm:max-w-xl"
         showCloseButton
       >
         <DialogHeader className="gap-3 border-b border-white/8 px-6 py-5 text-left">

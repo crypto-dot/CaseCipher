@@ -17,9 +17,6 @@ export default function Home() {
           <div className="mx-auto container px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
             <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="space-y-8">
-                <div className="inline-flex items-center rounded-full bg-white/6 px-3 py-1 text-xs font-medium text-muted-foreground shadow-[inset_0_1px_0_hsl(210_40%_96%/0.06)]">
-                  Case management, encrypted-by-design workflow
-                </div>
                 <div className="space-y-5">
                   <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
                     CaseCipher keeps every case clear, current, and accountable.
@@ -43,47 +40,18 @@ export default function Home() {
                     <Link href="/about">How it works</Link>
                   </Button>
                 </div>
-                <div className="grid max-w-xl grid-cols-3 gap-3 rounded-3xl bg-card/45 p-2 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)] backdrop-blur">
-                  <div className="rounded-2xl bg-white/4 p-4">
-                    <div className="text-2xl font-semibold tracking-tight">
-                      4
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Status lanes
-                    </div>
-                  </div>
-                  <div className="rounded-2xl bg-white/4 p-4">
-                    <div className="text-2xl font-semibold tracking-tight">
-                      1
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Source of truth
-                    </div>
-                  </div>
-                  <div className="rounded-2xl bg-white/4 p-4">
-                    <div className="text-2xl font-semibold tracking-tight">
-                      ∞
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Team clarity
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              <Card className="relative overflow-hidden rounded-4xl bg-card/70">
+              <Card className="relative overflow-hidden rounded-4xl bg-card/70 border-none max-w-2xl shadow-none">
                 <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
                 <CardHeader className="relative">
-                  <div className="mb-3 inline-flex w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                    Live operations
-                  </div>
                   <CardTitle>Operational snapshot</CardTitle>
                   <CardDescription>
                     A quick view of case status and who is actively working.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="relative space-y-4">
-                  <div className="rounded-2xl bg-background/55 p-4 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)]">
+                  <div className="rounded-2xl bg-background/55 p-4 ">
                     <div className="flex items-center justify-between gap-4">
                       <div className="font-medium">
                         CASE-1002 · Evidence packet
@@ -97,7 +65,7 @@ export default function Home() {
                       <span>Updated minutes ago</span>
                     </div>
                   </div>
-                  <div className="rounded-2xl bg-background/45 p-4 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.04)]">
+                  <div className="rounded-2xl bg-background/45 p-4 ">
                     <div className="flex items-center justify-between gap-4">
                       <div className="font-medium">
                         CASE-1003 · Signature mismatch
@@ -137,7 +105,7 @@ export default function Home() {
       <section className="dashboard-main">
         <div className="dashboard-shell-inner">
           <div className="mx-auto container px-4 pb-20 pt-8 sm:px-6">
-            <div className="rounded-4xl bg-white/3 p-6 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.05)] sm:p-8">
+            <div className="rounded-4xl bg-white/3 p-6  sm:p-8">
               <div className="flex flex-col gap-3">
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   Everything you need to run a case workflow
@@ -187,7 +155,7 @@ export default function Home() {
                 </Card>
               </div>
 
-              <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary/10 p-6 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.06)] sm:flex-row sm:items-center">
+              <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl bg-primary/10 p-6  sm:flex-row sm:items-center">
                 <div>
                   <div className="text-lg font-semibold tracking-tight">
                     Ready to try it?

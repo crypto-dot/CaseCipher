@@ -14,6 +14,7 @@ export default function SignInPage() {
           PASSWORD: "Password",
           SIGN_IN: "Sign in",
         }}
+        redirectTo="/dashboard"
       />
     </AuthPageShell>
   );

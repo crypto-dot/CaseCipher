@@ -9,6 +9,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
+  Settings,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -59,6 +60,12 @@ const navItems = [
     label: "Activity log",
     icon: Activity,
     match: (pathname: string) => pathname.startsWith("/dashboard/activity"),
+  },
+  {
+    href: "/dashboard/settings",
+    label: "Settings",
+    icon: Settings,
+    match: (pathname: string) => pathname.startsWith("/dashboard/settings"),
   },
 ] as const;
 
@@ -116,7 +123,7 @@ export function DashboardNav() {
           href="/dashboard"
           className="flex items-center gap-3 rounded-xl outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[hsl(213_94%_55%/0.35)] bg-[hsl(213_94%_55%/0.18)] text-[hsl(213_94%_92%)] shadow-[0_8px_28px_hsl(213_94%_25%/0.35)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[hsl(213_94%_55%/0.35)] bg-[hsl(213_94%_55%/0.18)] text-[hsl(213_94%_92%)]">
             <ShieldCheck className="h-5 w-5" aria-hidden />
           </div>
           <div className="dashboard-sidebar-copy min-w-0">

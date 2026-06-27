@@ -19,12 +19,14 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,20 +34,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCases, useCreateEvidence, useEvidence } from "@/lib/case-hooks";
 import {
-  useCases,
-  useCreateEvidence,
-  useEvidence,
-} from "@/lib/case-hooks";
+  DEFAULT_EVIDENCE_NUMBERING_RULE,
+  formatNumberingRule,
+  readNumberingSettings,
+} from "@/lib/numbering-settings";
 import type { Case } from "@/lib/types/case-types";
 import {
   acquisitionMethodSchema,
-  evidenceStatusSchema,
-  evidenceTypeSchema,
   type EvidenceItem,
   type EvidenceMedia,
+  evidenceStatusSchema,
+  evidenceTypeSchema,
 } from "@/lib/types/evidence-types";
 import { cn } from "@/lib/utils";
 
@@ -116,6 +118,14 @@ export default function EvidencePage() {
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState(ALL_STATUSES);
   const [typeFilter, setTypeFilter] = React.useState(ALL_TYPES);
+  const [defaultEvidenceNumber, setDefaultEvidenceNumber] = React.useState(() =>
+    formatNumberingRule(DEFAULT_EVIDENCE_NUMBERING_RULE),
+  );
+
+  React.useEffect(() => {
+    const { evidenceNumberingRule } = readNumberingSettings();
+    setDefaultEvidenceNumber(formatNumberingRule(evidenceNumberingRule));
+  }, []);
 
   const casesQuery = useCases();
   const evidenceQuery = useEvidence();
@@ -212,7 +222,7 @@ export default function EvidencePage() {
         </div>
         <Button
           type="button"
-          className="rounded-lg bg-[hsl(213_94%_55%)] text-white shadow-lg shadow-[hsl(213_94%_35%/0.25)] hover:bg-[hsl(213_94%_48%)]"
+          className="rounded-lg bg-[hsl(213_94%_55%)] text-white  hover:bg-[hsl(213_94%_48%)]"
           onClick={() => setOpen(true)}
         >
           <Plus className="size-4" />
@@ -220,12 +230,13 @@ export default function EvidencePage() {
         </Button>
       </header>
 
-      <div className="rounded-2xl border border-white/8 bg-[hsl(222_44%_8%/0.65)] p-3 shadow-[inset_0_1px_0_hsl(210_40%_96%/0.04)]">
+      <div className="rounded-2xl border border-white/8 bg-[hsl(222_44%_8%/0.65)] p-3 ">
         <div className="grid gap-3 md:grid-cols-[1fr_9rem_9rem]">
-          <label className="relative block">
+          <label className="relative block" htmlFor="searchEvidence">
             <span className="sr-only">Search evidence</span>
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              id="searchEvidence"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search evidence..."
@@ -344,14 +355,13 @@ export default function EvidencePage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {item.dateSeized
-                        ? new Date(`${item.dateSeized}T00:00:00`).toLocaleDateString(
-                            undefined,
-                            {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )
+                        ? new Date(
+                            `${item.dateSeized}T00:00:00`,
+                          ).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : "--"}
                     </td>
                     <td className="max-w-48 px-4 py-3 font-mono text-[0.65rem] text-muted-foreground">
@@ -369,7 +379,7 @@ export default function EvidencePage() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[min(92vh,58rem)] overflow-y-auto rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 text-foreground shadow-[0_24px_64px_hsl(222_70%_3%/0.55)] sm:max-w-3xl">
+        <DialogContent className="max-h-[min(92vh,58rem)] overflow-y-auto rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 text-foreground sm:max-w-3xl">
           <DialogHeader className="border-b border-white/8 px-6 py-5">
             <DialogTitle className="text-2xl">Add Evidence</DialogTitle>
             <DialogDescription className="sr-only">
@@ -418,6 +428,9 @@ export default function EvidencePage() {
                         <FormControl>
                           <Input placeholder="EVD-00009" {...field} />
                         </FormControl>
+                        <FormDescription>
+                          Leave blank to use {defaultEvidenceNumber}.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -647,7 +660,10 @@ export default function EvidencePage() {
 
                 <div className="space-y-2">
                   <Label>Evidence photos & videos</Label>
-                  <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-white/2 px-4 py-8 text-center text-muted-foreground transition-colors hover:bg-white/4">
+                  <label
+                    htmlFor="evidencePhotosVideos"
+                    className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-white/2 px-4 py-8 text-center text-muted-foreground transition-colors hover:bg-white/4"
+                  >
                     <span className="flex items-center gap-2">
                       <FileImage className="size-5" />
                       <Video className="size-5" />
@@ -659,6 +675,7 @@ export default function EvidencePage() {
                       Supports JPG, PNG, MP4, MOV, etc.
                     </span>
                     <Input
+                      id="evidencePhotosVideos"
                       type="file"
                       multiple
                       accept="image/*,video/*"
@@ -714,7 +731,7 @@ export default function EvidencePage() {
           if (!nextOpen) setSelectedEvidence(null);
         }}
       >
-        <DialogContent className="max-h-[min(92vh,48rem)] overflow-y-auto rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 text-foreground shadow-[0_24px_64px_hsl(222_70%_3%/0.55)] sm:max-w-2xl">
+        <DialogContent className="max-h-[min(92vh,48rem)] overflow-y-auto rounded-2xl border-white/8 bg-[hsl(222_44%_8%/0.98)] p-0 text-foreground sm:max-w-2xl">
           {selectedEvidence ? (
             <>
               <DialogHeader className="border-b border-white/8 px-6 py-5">
@@ -747,10 +764,19 @@ export default function EvidencePage() {
               <div className="space-y-6 px-6 py-5">
                 <div className="grid gap-3 text-sm sm:grid-cols-2">
                   {[
-                    ["Case", formatCaseNumber(caseById.get(selectedEvidence.caseId))],
-                    ["Type", titleCase(selectedEvidence.evidenceType ?? "other")],
+                    [
+                      "Case",
+                      formatCaseNumber(caseById.get(selectedEvidence.caseId)),
+                    ],
+                    [
+                      "Type",
+                      titleCase(selectedEvidence.evidenceType ?? "other"),
+                    ],
                     ["Date seized", selectedEvidence.dateSeized ?? "Not set"],
-                    ["Storage location", selectedEvidence.storageLocation ?? "Not set"],
+                    [
+                      "Storage location",
+                      selectedEvidence.storageLocation ?? "Not set",
+                    ],
                     ["Seized by", selectedEvidence.seizedBy ?? "Not set"],
                     [
                       "Acquisition method",
@@ -760,7 +786,10 @@ export default function EvidencePage() {
                       "Acquisition tool",
                       selectedEvidence.acquisitionTool ?? "Not set",
                     ],
-                    ["Serial number", selectedEvidence.serialNumber ?? "Not set"],
+                    [
+                      "Serial number",
+                      selectedEvidence.serialNumber ?? "Not set",
+                    ],
                     ["Make", selectedEvidence.make ?? "Not set"],
                     ["Model", selectedEvidence.model ?? "Not set"],
                   ].map(([label, value]) => (

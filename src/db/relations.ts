@@ -1,17 +1,17 @@
 import { relations } from "drizzle-orm/relations";
 import {
-  organizationInNeonAuth,
-  invitationInNeonAuth,
-  userInNeonAuth,
-  sessionInNeonAuth,
   accountInNeonAuth,
-  memberInNeonAuth,
-  clients,
-  cases,
   caseNotes,
-  personnel,
-  evidence,
+  cases,
+  clients,
   custodyEvents,
+  evidence,
+  invitationInNeonAuth,
+  memberInNeonAuth,
+  organizationInNeonAuth,
+  personnel,
+  sessionInNeonAuth,
+  userInNeonAuth,
 } from "./schema";
 
 export const invitationInNeonAuthRelations = relations(

@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth/server";
 
 export async function signUpWithEmail(
   _prevState: { error: string } | null,

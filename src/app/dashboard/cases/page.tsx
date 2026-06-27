@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCases } from "@/lib/case-hooks";
+import { getAssigneeNameById } from "@/lib/mocks";
 import { stageBadgeClass } from "@/lib/stage-colors";
 import { caseStatusLabel } from "@/lib/types/case-types";
-import { getAssigneeNameById } from "@/lib/mocks";
 import { cn } from "@/lib/utils";
 
 export default function CasesListPage() {
@@ -25,7 +25,7 @@ export default function CasesListPage() {
         </div>
         <Button
           asChild
-          className="w-fit rounded-xl bg-[hsl(213_94%_55%)] font-medium text-white shadow-lg shadow-[hsl(213_94%_35%/0.35)] hover:bg-[hsl(213_94%_48%)]"
+          className="w-fit rounded-xl bg-[hsl(213_94%_55%)] font-medium text-white  hover:bg-[hsl(213_94%_48%)]"
         >
           <Link href="/dashboard/cases/new">New case</Link>
         </Button>
