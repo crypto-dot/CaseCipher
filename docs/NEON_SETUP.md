@@ -28,7 +28,7 @@ This document describes how to set up Neon PostgreSQL and Neon Auth for CaseCiph
 
 1. In your Neon project dashboard, find the **Connection Details** panel
 2. Copy the **Connection string** (starts with `postgres://...`)
-3. Make sure to include `?sslmode=require` at the end
+3. Make sure to include `?sslmode=verify-full` at the end
 
 ## 4. Configure Environment Variables
 
@@ -36,7 +36,7 @@ Create a `.env.local` file in your project root:
 
 ```bash
 # Neon Database
-DATABASE_URL=postgres://user:password@ep-xxx.us-east-1.aws.neon.tech/casecipher?sslmode=require
+DATABASE_URL=postgres://user:password@ep-xxx.us-east-1.aws.neon.tech/casecipher?sslmode=verify-full
 
 # Neon Auth
 NEXT_PUBLIC_NEON_AUTH_URL=https://auth.neon.tech/project/xxx
@@ -128,5 +128,5 @@ Make sure your `.env.local` file contains `NEXT_PUBLIC_NEON_AUTH_URL`.
 ### Database connection errors
 
 1. Verify your connection string is correct
-2. Make sure `?sslmode=require` is included
+2. Make sure `?sslmode=verify-full` is included
 3. Check that your IP is not blocked (Neon allows all IPs by default)

@@ -34,7 +34,7 @@ export const userRole = pgEnum("user_role", [
   "examiner",
 ]);
 
-export const invitationInNeonAuth = neonAuth.table(
+const invitationInNeonAuth = neonAuth.table(
   "invitation",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -70,7 +70,7 @@ export const invitationInNeonAuth = neonAuth.table(
   ],
 );
 
-export const userInNeonAuth = neonAuth.table(
+const userInNeonAuth = neonAuth.table(
   "user",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -92,7 +92,7 @@ export const userInNeonAuth = neonAuth.table(
   (table) => [unique("user_email_key").on(table.email)],
 );
 
-export const sessionInNeonAuth = neonAuth.table(
+const sessionInNeonAuth = neonAuth.table(
   "session",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -122,7 +122,7 @@ export const sessionInNeonAuth = neonAuth.table(
   ],
 );
 
-export const organizationInNeonAuth = neonAuth.table(
+const organizationInNeonAuth = neonAuth.table(
   "organization",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -141,7 +141,7 @@ export const organizationInNeonAuth = neonAuth.table(
   ],
 );
 
-export const accountInNeonAuth = neonAuth.table(
+ const accountInNeonAuth = neonAuth.table(
   "account",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -234,7 +234,7 @@ export const memberInNeonAuth = neonAuth.table(
   ],
 );
 
-export const projectConfigInNeonAuth = neonAuth.table(
+const projectConfigInNeonAuth = neonAuth.table(
   "project_config",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),

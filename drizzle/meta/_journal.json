@@ -22,6 +22,13 @@
       "when": 1768783522547,
       "tag": "0002_acoustic_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782591691113,
+      "tag": "0003_slippery_mikhail_rasputin",
+      "breakpoints": true
     }
   ]
 }
