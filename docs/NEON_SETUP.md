@@ -6,6 +6,7 @@ This document describes how to set up Neon PostgreSQL and Neon Auth for CaseCiph
 
 - Node.js 18+
 - A Neon account ([console.neon.tech](https://console.neon.tech))
+- A Vercel Blob store for uploaded case and evidence files
 
 ## 1. Create Neon Project
 
@@ -40,7 +41,13 @@ DATABASE_URL=postgres://user:password@ep-xxx.us-east-1.aws.neon.tech/casecipher?
 
 # Neon Auth
 NEXT_PUBLIC_NEON_AUTH_URL=https://auth.neon.tech/project/xxx
+
+# Vercel Blob file storage
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxx
 ```
+
+`BLOB_READ_WRITE_TOKEN` must be a server-only read/write token from the
+Vercel dashboard. Do not expose it with a `NEXT_PUBLIC_` prefix.
 
 ## 5. Run Database Migrations
 
@@ -88,6 +95,7 @@ The database includes the following tables:
 | `clients` | Client/organization records |
 | `cases` | Case records with status, priority, assignment |
 | `evidence` | Evidence/attachments linked to cases |
+| `attachments` | Blob-backed file metadata linked to cases and optionally evidence |
 | `case_notes` | Notes on cases |
 | `audit_log` | Audit trail of all actions |
 

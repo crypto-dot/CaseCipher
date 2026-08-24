@@ -1,9 +1,196 @@
 {
-  "id": "83a98ab3-bd5a-441d-ad2f-8070697e7ed3",
-  "prevId": "4d8088c6-1367-477a-a269-e1487921cbb7",
+  "id": "45a1a1c8-b480-43ac-bf6f-a3f1abcba5cb",
+  "prevId": "83a98ab3-bd5a-441d-ad2f-8070697e7ed3",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.attachments": {
+      "name": "attachments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "case_id": {
+          "name": "case_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence_id": {
+          "name": "evidence_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pathname": {
+          "name": "pathname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "download_url": {
+          "name": "download_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "filename": {
+          "name": "filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "size": {
+          "name": "size",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sha256": {
+          "name": "sha256",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "md5": {
+          "name": "md5",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uploaded_by": {
+          "name": "uploaded_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "attachments_case_id_idx": {
+          "name": "attachments_case_id_idx",
+          "columns": [
+            {
+              "expression": "case_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "uuid_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "attachments_evidence_id_idx": {
+          "name": "attachments_evidence_id_idx",
+          "columns": [
+            {
+              "expression": "evidence_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "uuid_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "attachments_uploaded_by_idx": {
+          "name": "attachments_uploaded_by_idx",
+          "columns": [
+            {
+              "expression": "uploaded_by",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "attachments_case_id_cases_id_fk": {
+          "name": "attachments_case_id_cases_id_fk",
+          "tableFrom": "attachments",
+          "tableTo": "cases",
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "attachments_evidence_id_evidence_id_fk": {
+          "name": "attachments_evidence_id_evidence_id_fk",
+          "tableFrom": "attachments",
+          "tableTo": "evidence",
+          "columnsFrom": ["evidence_id"],
+          "columnsTo": ["evidence_id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "attachments_pathname_unique": {
+          "name": "attachments_pathname_unique",
+          "nullsNotDistinct": false,
+          "columns": ["pathname"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.audit_log": {
       "name": "audit_log",
       "schema": "",
@@ -129,12 +316,8 @@
           "name": "case_notes_case_id_cases_id_fk",
           "tableFrom": "case_notes",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -283,12 +466,8 @@
           "name": "cases_client_id_clients_id_fk",
           "tableFrom": "cases",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -298,9 +477,7 @@
         "cases_case_number_unique": {
           "name": "cases_case_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "case_number"
-          ]
+          "columns": ["case_number"]
         }
       },
       "policies": {},
@@ -475,12 +652,8 @@
           "name": "custody_events_evidence_id_evidence_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "evidence",
-          "columnsFrom": [
-            "evidence_id"
-          ],
-          "columnsTo": [
-            "evidence_id"
-          ],
+          "columnsFrom": ["evidence_id"],
+          "columnsTo": ["evidence_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -488,12 +661,8 @@
           "name": "custody_events_from_custodian_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "from_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["from_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -501,12 +670,8 @@
           "name": "custody_events_to_custodian_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "to_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["to_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -514,12 +679,8 @@
           "name": "custody_events_recorded_by_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "recorded_by"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["recorded_by"],
+          "columnsTo": ["person_id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -688,12 +849,8 @@
           "name": "evidence_current_custodian_personnel_person_id_fk",
           "tableFrom": "evidence",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "current_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["current_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -701,12 +858,8 @@
           "name": "evidence_case_id_cases_id_fk",
           "tableFrom": "evidence",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -714,12 +867,8 @@
           "name": "evidence_current_custodian_personnel_id_fk",
           "tableFrom": "evidence",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "current_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["current_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -806,12 +955,8 @@
           "tableFrom": "member",
           "tableTo": "organization",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -820,12 +965,8 @@
           "tableFrom": "member",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -892,9 +1033,7 @@
         "personnel_badge_or_employee_id_unique": {
           "name": "personnel_badge_or_employee_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "badge_or_employee_id"
-          ]
+          "columns": ["badge_or_employee_id"]
         }
       },
       "policies": {},
@@ -961,12 +1100,8 @@
           "tableFrom": "user_profiles",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -976,16 +1111,12 @@
         "user_profiles_user_id_unique": {
           "name": "user_profiles_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "user_profiles_badge_number_unique": {
           "name": "user_profiles_badge_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "badge_number"
-          ]
+          "columns": ["badge_number"]
         }
       },
       "policies": {},
@@ -997,11 +1128,7 @@
     "public.case_priority": {
       "name": "case_priority",
       "schema": "public",
-      "values": [
-        "low",
-        "medium",
-        "high"
-      ]
+      "values": ["low", "medium", "high"]
     },
     "public.case_status": {
       "name": "case_status",
@@ -1018,12 +1145,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "admin",
-        "manager",
-        "analyst",
-        "examiner"
-      ]
+      "values": ["admin", "manager", "analyst", "examiner"]
     }
   },
   "schemas": {},

@@ -1,6 +1,13 @@
 "use client";
 
-import { FileIcon, Loader2, Trash2, Upload, UserRound } from "lucide-react";
+import {
+  Download,
+  FileIcon,
+  Loader2,
+  Trash2,
+  Upload,
+  UserRound,
+} from "lucide-react";
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,13 +28,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  attachmentKey,
-  formatFileSize,
-  toAttachmentMeta,
-} from "@/lib/attachments";
+import { attachmentKey, formatFileSize } from "@/lib/attachments";
 import {
   useAddCaseAttachments,
+  useCaseAttachmentDownloadUrl,
   useCaseAttachments,
   useReassignCase,
   useRemoveCaseAttachment,
@@ -69,6 +73,7 @@ export function CaseDetailModal({
 
   const attachmentsQuery = useCaseAttachments(caseItem?.id ?? null);
   const addAttachmentsMut = useAddCaseAttachments();
+  const downloadAttachmentMut = useCaseAttachmentDownloadUrl();
   const removeAttachmentMut = useRemoveCaseAttachment();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
@@ -79,12 +84,30 @@ export function CaseDetailModal({
     : undefined;
 
   const handleFiles = React.useCallback(
-    (files: FileList | File[] | null) => {
+    async (files: FileList | File[] | null) => {
       if (!caseItem || !files?.length) return;
-      const meta = toAttachmentMeta(files);
-      addAttachmentsMut.mutate({ caseId: caseItem.id, attachments: meta });
+
+     const data = await addAttachmentsMut.mutateAsync({
+        caseId: caseItem.id,
+        files: Array.from(files),
+      });
+      console.log("data", data);
     },
-    [caseItem, addAttachmentsMut],
+    [caseItem, addAttachmentsMut.data],
+  );
+
+  const handleDownload = React.useCallback(
+    (id: string) => {
+      downloadAttachmentMut.mutate(
+        { id },
+        {
+          onSuccess: ({ url }) => {
+            window.open(url, "_blank", "noopener,noreferrer");
+          },
+        },
+      );
+    },
+    [downloadAttachmentMut],
   );
 
   const onDragOver = (e: React.DragEvent) => {
@@ -275,6 +298,7 @@ export function CaseDetailModal({
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
                 onClick={() => fileInputRef.current?.click()}
+                disabled={addAttachmentsMut.isPending}
               >
                 <Upload
                   className={cn(
@@ -307,8 +331,25 @@ export function CaseDetailModal({
               {addAttachmentsMut.isPending && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
-                  Adding files…
+                  Uploading files…
                 </div>
+              )}
+
+              {(addAttachmentsMut.isError ||
+                attachmentsQuery.isError ||
+                downloadAttachmentMut.isError ||
+                removeAttachmentMut.isError) && (
+                <p className="text-sm text-destructive" role="alert">
+                  {addAttachmentsMut.error instanceof Error
+                    ? addAttachmentsMut.error.message
+                    : attachmentsQuery.error instanceof Error
+                      ? attachmentsQuery.error.message
+                      : downloadAttachmentMut.error instanceof Error
+                        ? downloadAttachmentMut.error.message
+                        : removeAttachmentMut.error instanceof Error
+                          ? removeAttachmentMut.error.message
+                          : "File action failed. Try again."}
+                </p>
               )}
 
               {attachmentsQuery.isLoading ? (
@@ -332,23 +373,36 @@ export function CaseDetailModal({
                         <FileIcon className="size-4 shrink-0 text-muted-foreground" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">
-                            {file.name}
+                            {file.filename}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {formatFileSize(file.size)}
+                            {" · "}
+                            {file.contentType}
                           </p>
                         </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon-sm"
+                          className="shrink-0 text-muted-foreground hover:text-foreground"
+                          aria-label={`Download ${file.filename}`}
+                          disabled={downloadAttachmentMut.isPending}
+                          onClick={() => handleDownload(file.id)}
+                        >
+                          <Download className="size-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
                           className="shrink-0 text-muted-foreground hover:text-destructive"
-                          aria-label={`Remove ${file.name}`}
+                          aria-label={`Remove ${file.filename}`}
                           disabled={removeAttachmentMut.isPending}
                           onClick={() =>
                             removeAttachmentMut.mutate({
                               caseId: caseItem.id,
-                              key,
+                              id: file.id,
                             })
                           }
                         >
@@ -361,8 +415,8 @@ export function CaseDetailModal({
               )}
 
               <p className="text-xs text-muted-foreground/80">
-                Files are stored locally in this browser only. Backend upload is
-                not connected yet.
+                Files are stored in secure backend storage and downloads use
+                short-lived signed URLs.
               </p>
             </div>
           </div>

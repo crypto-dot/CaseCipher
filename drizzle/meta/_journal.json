@@ -29,6 +29,20 @@
       "when": 1782591691113,
       "tag": "0003_slippery_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787529475212,
+      "tag": "0004_fantastic_stone_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787533200000,
+      "tag": "0005_unconstrained_attachments",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,9 @@
 import { z } from "zod";
 import type { caseNotes, cases } from "@/db/schema";
+import {
+  attachmentSchema,
+  createAttachmentSchema,
+} from "@/lib/types/attachment-types";
 
 /** Kanban / workflow stages — status values match board column ids. */
 export const CASE_STAGES = [
@@ -124,11 +128,9 @@ export const updateCaseNoteSchema = createCaseNoteSchema
   .partial();
 export type UpdateCaseNoteInput = z.infer<typeof updateCaseNoteSchema>;
 
-/** UI-only attachment metadata (not stored on `cases` table). */
-export const caseAttachmentsSchema = z.object({
-  name: z.string(),
-  size: z.number(),
-  type: z.string(),
-  lastModified: z.number(),
-});
+/** DB-backed case attachment metadata. File bytes live in Blob storage. */
+export const caseAttachmentsSchema = attachmentSchema;
 export type CaseAttachment = z.infer<typeof caseAttachmentsSchema>;
+
+export const createCaseAttachmentSchema = createAttachmentSchema;
+export type NewCaseAttachment = z.infer<typeof createCaseAttachmentSchema>;

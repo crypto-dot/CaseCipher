@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm/relations";
 import {
+  attachments,
   caseNotes,
   cases,
   clients,
@@ -15,6 +16,7 @@ export const casesRelations = relations(cases, ({ one, many }) => ({
   }),
   caseNotes: many(caseNotes),
   evidences: many(evidence),
+  attachments: many(attachments),
 }));
 
 export const clientsRelations = relations(clients, ({ many }) => ({
@@ -45,6 +47,7 @@ export const evidenceRelations = relations(evidence, ({ one, many }) => ({
     references: [personnel.id],
   }),
   custodyEvents: many(custodyEvents),
+  attachments: many(attachments),
 }));
 
 export const custodyEventsRelations = relations(custodyEvents, ({ one }) => ({
@@ -66,5 +69,16 @@ export const custodyEventsRelations = relations(custodyEvents, ({ one }) => ({
     fields: [custodyEvents.recordedBy],
     references: [personnel.id],
     relationName: "recordedBy",
+  }),
+}));
+
+export const attachmentsRelations = relations(attachments, ({ one }) => ({
+  case: one(cases, {
+    fields: [attachments.caseId],
+    references: [cases.id],
+  }),
+  evidence: one(evidence, {
+    fields: [attachments.evidenceId],
+    references: [evidence.id],
   }),
 }));

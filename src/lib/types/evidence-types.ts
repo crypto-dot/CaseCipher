@@ -1,5 +1,9 @@
 import { z } from "zod";
 import type { evidence } from "@/db/schema";
+import {
+  type AttachmentFileMeta,
+  attachmentFileMetaSchema,
+} from "@/lib/types/attachment-types";
 
 export const evidenceTypeSchema = z.enum([
   "hard_drive",
@@ -36,13 +40,8 @@ const hashMd5Schema = z.string().length(32);
 const hashSha256Schema = z.string().length(64);
 const hashSha512Schema = z.string().length(128);
 
-export const evidenceMediaSchema = z.object({
-  name: z.string(),
-  size: z.number(),
-  type: z.string(),
-  lastModified: z.number(),
-});
-export type EvidenceMedia = z.infer<typeof evidenceMediaSchema>;
+export const evidenceMediaSchema = attachmentFileMetaSchema;
+export type EvidenceMedia = AttachmentFileMeta;
 
 export const evidenceSchema = z.object({
   id: z.uuid(),

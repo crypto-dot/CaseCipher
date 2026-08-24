@@ -113,12 +113,8 @@
           "tableFrom": "account",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -254,12 +250,8 @@
           "name": "case_notes_case_id_cases_id_fk",
           "tableFrom": "case_notes",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -408,12 +400,8 @@
           "name": "cases_client_id_clients_id_fk",
           "tableFrom": "cases",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -423,9 +411,7 @@
         "cases_case_number_unique": {
           "name": "cases_case_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "case_number"
-          ]
+          "columns": ["case_number"]
         }
       },
       "policies": {},
@@ -600,12 +586,8 @@
           "name": "custody_events_evidence_id_evidence_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "evidence",
-          "columnsFrom": [
-            "evidence_id"
-          ],
-          "columnsTo": [
-            "evidence_id"
-          ],
+          "columnsFrom": ["evidence_id"],
+          "columnsTo": ["evidence_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -613,12 +595,8 @@
           "name": "custody_events_from_custodian_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "from_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["from_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -626,12 +604,8 @@
           "name": "custody_events_to_custodian_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "to_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["to_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -639,12 +613,8 @@
           "name": "custody_events_recorded_by_personnel_id_fk",
           "tableFrom": "custody_events",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "recorded_by"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["recorded_by"],
+          "columnsTo": ["person_id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -813,12 +783,8 @@
           "name": "evidence_current_custodian_personnel_person_id_fk",
           "tableFrom": "evidence",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "current_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["current_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -826,12 +792,8 @@
           "name": "evidence_case_id_cases_id_fk",
           "tableFrom": "evidence",
           "tableTo": "cases",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -839,12 +801,8 @@
           "name": "evidence_current_custodian_personnel_id_fk",
           "tableFrom": "evidence",
           "tableTo": "personnel",
-          "columnsFrom": [
-            "current_custodian"
-          ],
-          "columnsTo": [
-            "person_id"
-          ],
+          "columnsFrom": ["current_custodian"],
+          "columnsTo": ["person_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -950,12 +908,8 @@
           "tableFrom": "invitation",
           "tableTo": "organization",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -964,12 +918,8 @@
           "tableFrom": "invitation",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "inviterId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["inviterId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1056,12 +1006,8 @@
           "tableFrom": "member",
           "tableTo": "organization",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1070,12 +1016,8 @@
           "tableFrom": "member",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1152,9 +1094,7 @@
         "organization_slug_key": {
           "name": "organization_slug_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -1217,9 +1157,7 @@
         "personnel_badge_or_employee_id_unique": {
           "name": "personnel_badge_or_employee_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "badge_or_employee_id"
-          ]
+          "columns": ["badge_or_employee_id"]
         }
       },
       "policies": {},
@@ -1301,9 +1239,7 @@
         "project_config_endpoint_id_key": {
           "name": "project_config_endpoint_id_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "endpoint_id"
-          ]
+          "columns": ["endpoint_id"]
         }
       },
       "policies": {},
@@ -1401,12 +1337,8 @@
           "tableFrom": "session",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1416,9 +1348,7 @@
         "session_token_key": {
           "name": "session_token_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1506,9 +1436,7 @@
         "user_email_key": {
           "name": "user_email_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1575,12 +1503,8 @@
           "tableFrom": "user_profiles",
           "tableTo": "user",
           "schemaTo": "neon_auth",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1590,16 +1514,12 @@
         "user_profiles_user_id_unique": {
           "name": "user_profiles_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "user_profiles_badge_number_unique": {
           "name": "user_profiles_badge_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "badge_number"
-          ]
+          "columns": ["badge_number"]
         }
       },
       "policies": {},
@@ -1611,11 +1531,7 @@
     "public.case_priority": {
       "name": "case_priority",
       "schema": "public",
-      "values": [
-        "low",
-        "medium",
-        "high"
-      ]
+      "values": ["low", "medium", "high"]
     },
     "public.case_status": {
       "name": "case_status",
@@ -1632,12 +1548,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "admin",
-        "manager",
-        "analyst",
-        "examiner"
-      ]
+      "values": ["admin", "manager", "analyst", "examiner"]
     }
   },
   "schemas": {},

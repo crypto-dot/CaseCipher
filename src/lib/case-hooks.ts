@@ -2,14 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// Use the localStorage-based API for now until database is configured
-// Once DATABASE_URL is set, these can be switched to use server actions
 import {
-  addCaseAttachments,
+  deleteCaseAttachment,
+  getCaseAttachmentDownloadUrl,
   listAllCaseAttachments,
   listCaseAttachments,
-  removeCaseAttachment,
-} from "@/lib/attachments";
+  uploadCaseAttachments,
+} from "@/app/actions/attachments";
 import {
   type CreateCaseFormInput,
   createCase,
@@ -22,7 +21,6 @@ import {
   createEvidence,
   listEvidence,
 } from "@/lib/evidence-api";
-import type { CaseAttachment } from "@/lib/types/case-types";
 
 const keys = {
   cases: ["cases"] as const,
@@ -101,14 +99,18 @@ export function useAllCaseAttachments() {
 
 export function useAddCaseAttachments() {
   const qc = useQueryClient();
+  console.log("useAddCaseAttachments");
   return useMutation({
-    mutationFn: ({
-      caseId,
-      attachments,
-    }: {
-      caseId: string;
-      attachments: CaseAttachment[];
-    }) => addCaseAttachments(caseId, attachments),
+    mutationFn: async ({ caseId, files }: { caseId: string; files: File[] }) => {
+      console.log("useAddCaseAttachments mutationFn", caseId, files);
+      const formData = new FormData();
+      formData.set("caseId", caseId);
+      for (const file of files) {
+        formData.append("files", file);
+      }
+      console.log("formData", formData.getAll("files"));
+      return await uploadCaseAttachments(formData);
+    },
     onSuccess: async (_data, { caseId }) => {
       await qc.invalidateQueries({ queryKey: keys.attachments });
       await qc.invalidateQueries({ queryKey: [...keys.attachments, caseId] });
@@ -119,11 +121,17 @@ export function useAddCaseAttachments() {
 export function useRemoveCaseAttachment() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ caseId, key }: { caseId: string; key: string }) =>
-      removeCaseAttachment(caseId, key),
+    mutationFn: ({ id }: { caseId: string; id: string }) =>
+      deleteCaseAttachment(id),
     onSuccess: async (_data, { caseId }) => {
       await qc.invalidateQueries({ queryKey: keys.attachments });
       await qc.invalidateQueries({ queryKey: [...keys.attachments, caseId] });
     },
+  });
+}
+
+export function useCaseAttachmentDownloadUrl() {
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => getCaseAttachmentDownloadUrl(id),
   });
 }

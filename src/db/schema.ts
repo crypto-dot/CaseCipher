@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   date,
   foreignKey,
@@ -34,7 +35,7 @@ export const userRole = pgEnum("user_role", [
   "examiner",
 ]);
 
-const invitationInNeonAuth = neonAuth.table(
+const _invitationInNeonAuth = neonAuth.table(
   "invitation",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -92,7 +93,7 @@ const userInNeonAuth = neonAuth.table(
   (table) => [unique("user_email_key").on(table.email)],
 );
 
-const sessionInNeonAuth = neonAuth.table(
+const _sessionInNeonAuth = neonAuth.table(
   "session",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -141,7 +142,7 @@ const organizationInNeonAuth = neonAuth.table(
   ],
 );
 
- const accountInNeonAuth = neonAuth.table(
+const _accountInNeonAuth = neonAuth.table(
   "account",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -234,7 +235,7 @@ export const memberInNeonAuth = neonAuth.table(
   ],
 );
 
-const projectConfigInNeonAuth = neonAuth.table(
+const _projectConfigInNeonAuth = neonAuth.table(
   "project_config",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -431,6 +432,49 @@ export const evidence = pgTable(
       foreignColumns: [personnel.id],
       name: "evidence_current_custodian_personnel_id_fk",
     }).onDelete("set null"),
+  ],
+);
+
+export const attachments = pgTable(
+  "attachments",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    caseId: uuid("case_id").notNull(),
+    evidenceId: uuid("evidence_id"),
+    pathname: text().notNull(),
+    url: text().notNull(),
+    downloadUrl: text("download_url"),
+    filename: text().notNull(),
+    contentType: text("content_type").notNull(),
+    size: bigint({ mode: "number" }).notNull(),
+    sha256: varchar({ length: 64 }),
+    md5: varchar({ length: 32 }),
+    uploadedBy: text("uploaded_by").notNull(),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("attachments_case_id_idx").using(
+      "btree",
+      table.caseId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("attachments_evidence_id_idx").using(
+      "btree",
+      table.evidenceId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("attachments_uploaded_by_idx").using(
+      "btree",
+      table.uploadedBy.asc().nullsLast().op("text_ops"),
+    ),
+    unique("attachments_pathname_unique").on(table.pathname),
   ],
 );
 
