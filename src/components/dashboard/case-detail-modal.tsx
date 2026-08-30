@@ -31,7 +31,6 @@ import { Separator } from "@/components/ui/separator";
 import { attachmentKey, formatFileSize } from "@/lib/attachments";
 import {
   useAddCaseAttachments,
-  useCaseAttachmentDownloadUrl,
   useCaseAttachments,
   useReassignCase,
   useRemoveCaseAttachment,
@@ -73,7 +72,6 @@ export function CaseDetailModal({
 
   const attachmentsQuery = useCaseAttachments(caseItem?.id ?? null);
   const addAttachmentsMut = useAddCaseAttachments();
-  const downloadAttachmentMut = useCaseAttachmentDownloadUrl();
   const removeAttachmentMut = useRemoveCaseAttachment();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
@@ -94,20 +92,6 @@ export function CaseDetailModal({
       console.log("data", data);
     },
     [caseItem, addAttachmentsMut.data],
-  );
-
-  const handleDownload = React.useCallback(
-    (id: string) => {
-      downloadAttachmentMut.mutate(
-        { id },
-        {
-          onSuccess: ({ url }) => {
-            window.open(url, "_blank", "noopener,noreferrer");
-          },
-        },
-      );
-    },
-    [downloadAttachmentMut],
   );
 
   const onDragOver = (e: React.DragEvent) => {
@@ -337,18 +321,15 @@ export function CaseDetailModal({
 
               {(addAttachmentsMut.isError ||
                 attachmentsQuery.isError ||
-                downloadAttachmentMut.isError ||
                 removeAttachmentMut.isError) && (
                 <p className="text-sm text-destructive" role="alert">
                   {addAttachmentsMut.error instanceof Error
                     ? addAttachmentsMut.error.message
                     : attachmentsQuery.error instanceof Error
                       ? attachmentsQuery.error.message
-                      : downloadAttachmentMut.error instanceof Error
-                        ? downloadAttachmentMut.error.message
-                        : removeAttachmentMut.error instanceof Error
-                          ? removeAttachmentMut.error.message
-                          : "File action failed. Try again."}
+                      : removeAttachmentMut.error instanceof Error
+                        ? removeAttachmentMut.error.message
+                        : "File action failed. Try again."}
                 </p>
               )}
 
@@ -382,15 +363,19 @@ export function CaseDetailModal({
                           </p>
                         </div>
                         <Button
-                          type="button"
+                          asChild
                           variant="ghost"
                           size="icon-sm"
                           className="shrink-0 text-muted-foreground hover:text-foreground"
-                          aria-label={`Download ${file.filename}`}
-                          disabled={downloadAttachmentMut.isPending}
-                          onClick={() => handleDownload(file.id)}
                         >
-                          <Download className="size-4" />
+                          <a
+                            href={`/api/attachments/${file.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Download ${file.filename}`}
+                          >
+                            <Download className="size-4" />
+                          </a>
                         </Button>
                         <Button
                           type="button"
@@ -415,8 +400,8 @@ export function CaseDetailModal({
               )}
 
               <p className="text-xs text-muted-foreground/80">
-                Files are stored in secure backend storage and downloads use
-                short-lived signed URLs.
+                Files are stored in secure backend storage. Downloads are
+                authenticated and use short-lived access to storage.
               </p>
             </div>
           </div>

@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   deleteCaseAttachment,
-  getCaseAttachmentDownloadUrl,
   listAllCaseAttachments,
   listCaseAttachments,
   uploadCaseAttachments,
@@ -99,10 +98,8 @@ export function useAllCaseAttachments() {
 
 export function useAddCaseAttachments() {
   const qc = useQueryClient();
-  console.log("useAddCaseAttachments");
   return useMutation({
     mutationFn: async ({ caseId, files }: { caseId: string; files: File[] }) => {
-      console.log("useAddCaseAttachments mutationFn", caseId, files);
       const formData = new FormData();
       formData.set("caseId", caseId);
       for (const file of files) {
@@ -127,11 +124,5 @@ export function useRemoveCaseAttachment() {
       await qc.invalidateQueries({ queryKey: keys.attachments });
       await qc.invalidateQueries({ queryKey: [...keys.attachments, caseId] });
     },
-  });
-}
-
-export function useCaseAttachmentDownloadUrl() {
-  return useMutation({
-    mutationFn: ({ id }: { id: string }) => getCaseAttachmentDownloadUrl(id),
   });
 }

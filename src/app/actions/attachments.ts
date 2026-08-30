@@ -13,9 +13,7 @@ import {
 } from "@/db/queries/attachments";
 import { createAuditLog } from "@/db/queries/audit";
 import {
-  createRemoteDownloadUrl,
   deleteAttachmentBlob,
-  hasLocalAttachment,
   storeAttachmentBlob,
 } from "@/lib/attachment-storage";
 import { requireUser } from "@/lib/auth/session";
@@ -25,8 +23,6 @@ import {
   MAX_ATTACHMENTS_PER_UPLOAD,
 } from "@/lib/types/attachment-types";
 import type { CaseAttachment } from "@/lib/types/case-types";
-
-const DOWNLOAD_URL_TTL_MS = 10 * 60 * 1000;
 
 type AuthUser = {
   id: string;
@@ -292,37 +288,4 @@ export async function deleteCaseAttachment(
 
   revalidateAttachmentPaths(attachment.caseId);
   return dbListCaseAttachments(attachment.caseId);
-}
-
-export async function getCaseAttachmentDownloadUrl(id: string) {
-  const user = await requireUser();
-  const attachmentId = attachmentIdSchema.parse(id);
-  const attachment = await getAttachmentById(attachmentId);
-  if (!attachment) {
-    throw new Error("Attachment not found");
-  }
-
-  const validUntil = Date.now() + DOWNLOAD_URL_TTL_MS;
-  const presignedUrl = (await hasLocalAttachment(attachment.pathname))
-    ? `/api/attachments/${attachment.id}`
-    : await createRemoteDownloadUrl(attachment.pathname, validUntil);
-
-  await logAttachmentAction({
-    user,
-    action: "download_url_issued",
-    attachmentId: attachment.id,
-    caseId: attachment.caseId,
-    evidenceId: attachment.evidenceId,
-    changes: {
-      attachmentId: attachment.id,
-      filename: attachment.filename,
-      validUntil,
-    },
-  });
-
-  return {
-    url: presignedUrl,
-    filename: attachment.filename,
-    expiresAt: new Date(validUntil).toISOString(),
-  };
 }

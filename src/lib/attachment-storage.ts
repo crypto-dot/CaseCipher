@@ -68,6 +68,8 @@ export async function storeAttachmentBlob(
 }
 
 export async function deleteAttachmentBlob(pathname: string) {
+  invalidateRemoteDownloadUrl(pathname);
+
   if (await hasLocalAttachment(pathname)) {
     await unlink(localFilePath(pathname));
     return;
@@ -80,6 +82,34 @@ export async function deleteAttachmentBlob(pathname: string) {
 
 export async function readLocalAttachment(pathname: string) {
   return readFile(localFilePath(pathname));
+}
+
+export const DOWNLOAD_URL_TTL_MS = 1 * 60 * 1000;
+const DOWNLOAD_URL_REFRESH_BUFFER_MS = 30 * 1000;
+
+type CachedSignedUrl = {
+  url: string;
+  expiresAt: number;
+};
+
+const globalForBlob = globalThis as typeof globalThis & {
+  attachmentSignedUrls?: Map<string, CachedSignedUrl>;
+  attachmentSignedUrlPending?: Map<string, Promise<CachedSignedUrl>>;
+};
+
+if (!globalForBlob.attachmentSignedUrls) {
+  globalForBlob.attachmentSignedUrls = new Map();
+}
+if (!globalForBlob.attachmentSignedUrlPending) {
+  globalForBlob.attachmentSignedUrlPending = new Map();
+}
+
+const signedUrlCache = globalForBlob.attachmentSignedUrls;
+const signedUrlPending = globalForBlob.attachmentSignedUrlPending;
+
+export function invalidateRemoteDownloadUrl(pathname: string) {
+  signedUrlCache.delete(pathname);
+  signedUrlPending.delete(pathname);
 }
 
 export async function createRemoteDownloadUrl(
@@ -99,4 +129,32 @@ export async function createRemoteDownloadUrl(
   });
 
   return presignedUrl;
+}
+
+export async function getRemoteDownloadUrl(pathname: string) {
+  const cached = signedUrlCache.get(pathname);
+  if (
+    cached &&
+    cached.expiresAt - DOWNLOAD_URL_REFRESH_BUFFER_MS > Date.now()
+  ) {
+    return cached;
+  }
+
+  const pending = signedUrlPending.get(pathname);
+  if (pending) {
+    return pending;
+  }
+
+  const request = (async () => {
+    const expiresAt = Date.now() + DOWNLOAD_URL_TTL_MS;
+    const url = await createRemoteDownloadUrl(pathname, expiresAt);
+    const next: CachedSignedUrl = { url, expiresAt };
+    signedUrlCache.set(pathname, next);
+    return next;
+  })().finally(() => {
+    signedUrlPending.delete(pathname);
+  });
+
+  signedUrlPending.set(pathname, request);
+  return request;
 }
