@@ -1,11 +1,16 @@
 import type { Config } from "drizzle-kit";
 import { defineConfig } from "drizzle-kit";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+const connectionString =
+  process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error(
+    "MIGRATION_DATABASE_URL or DATABASE_URL environment variable is required",
+  );
 }
 
-const databaseUrl = new URL(process.env.DATABASE_URL);
+const databaseUrl = new URL(connectionString);
 const sslMode = databaseUrl.searchParams.get("sslmode");
 
 if (sslMode && ["prefer", "require", "verify-ca"].includes(sslMode)) {

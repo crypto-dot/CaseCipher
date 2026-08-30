@@ -475,6 +475,16 @@ export const attachments = pgTable(
       table.uploadedBy.asc().nullsLast().op("text_ops"),
     ),
     unique("attachments_pathname_unique").on(table.pathname),
+    foreignKey({
+      columns: [table.caseId],
+      foreignColumns: [cases.id],
+      name: "attachments_case_id_cases_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.evidenceId],
+      foreignColumns: [evidence.id],
+      name: "attachments_evidence_id_evidence_id_fk",
+    }).onDelete("set null"),
   ],
 );
 
