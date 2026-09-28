@@ -58,7 +58,7 @@ export async function updateUserRole(
     userName: admin.name,
     action: "user.role_changed",
     entityType: "user",
-    entityId: before.id,
+    entityId: before.userId,
     changes: {
       before: { role: before.role },
       after: { role },
@@ -96,10 +96,10 @@ export async function setUserActive(
     userName: admin.name,
     action: active ? "user.activated" : "user.deactivated",
     entityType: "user",
-    entityId: before.id,
+    entityId: before.userId,
     changes: {
-      before: { active: before.active },
-      after: { active },
+      before: { isActive: before.isActive },
+      after: { isActive: active },
       targetUserId,
     },
   });
@@ -134,7 +134,7 @@ export async function updateUserBadge(
     userName: admin.name,
     action: "user.badge_updated",
     entityType: "user",
-    entityId: before.id,
+    entityId: before.userId,
     changes: {
       before: { badgeNumber: before.badgeNumber },
       after: { badgeNumber },

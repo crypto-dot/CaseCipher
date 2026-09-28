@@ -269,29 +269,6 @@ export const auditLog = pgTable("audit_log", {
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
 });
 
-export const userProfiles = pgTable(
-  "user_profiles",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    userId: uuid("user_id").references(() => userInNeonAuth.id, {
-      onDelete: "cascade",
-    }),
-    badgeNumber: text("badge_number"),
-    role: userRole().default("examiner").notNull(),
-    active: boolean().default(true).notNull(),
-    createdAt: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
-  },
-  (table) => [
-    unique("user_profiles_user_id_unique").on(table.userId),
-    unique("user_profiles_badge_number_unique").on(table.badgeNumber),
-  ],
-);
-
 export const cases = pgTable(
   "cases",
   {
@@ -300,7 +277,6 @@ export const cases = pgTable(
     title: text().notNull(),
     clientId: uuid("client_id"),
     caseType: text("case_type"),
-    requestor: text(),
     assignedExaminer: text("assigned_examiner"),
     subjectName: text("subject_name"),
     department: text(),
@@ -367,17 +343,21 @@ export const clients = pgTable("clients", {
 export const personnel = pgTable(
   "personnel",
   {
-    id: uuid("person_id").defaultRandom().primaryKey().notNull(),
-    fullName: varchar("full_name", { length: 150 }).notNull(),
-    badgeOrEmployeeId: varchar("badge_or_employee_id", { length: 50 }),
-    organization: varchar({ length: 100 }),
-    role: varchar({ length: 50 }),
-    email: varchar({ length: 150 }),
-    isActive: boolean("is_active").default(true),
+    userId: uuid("user_id")
+      .primaryKey()
+      .notNull()
+      .references(() => userInNeonAuth.id, { onDelete: "cascade" }),
+    badgeNumber: text("badge_number"),
+    role: userRole().default("examiner").notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
-  (table) => [
-    unique("personnel_badge_or_employee_id_unique").on(table.badgeOrEmployeeId),
-  ],
+  (table) => [unique("personnel_badge_number_unique").on(table.badgeNumber)],
 );
 
 export const evidence = pgTable(
@@ -415,7 +395,7 @@ export const evidence = pgTable(
     hashSha256: varchar("hash_sha256", { length: 64 }),
     hashSha512: varchar("hash_sha512", { length: 128 }),
     currentLocation: varchar("current_location", { length: 255 }),
-    currentCustodian: uuid("current_custodian").references(() => personnel.id),
+    currentCustodian: uuid("current_custodian"),
     status: varchar({ length: 30 }).default("active"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
@@ -429,7 +409,7 @@ export const evidence = pgTable(
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.currentCustodian],
-      foreignColumns: [personnel.id],
+      foreignColumns: [personnel.userId],
       name: "evidence_current_custodian_personnel_id_fk",
     }).onDelete("set null"),
   ],
@@ -520,17 +500,17 @@ export const custodyEvents = pgTable(
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.fromCustodian],
-      foreignColumns: [personnel.id],
+      foreignColumns: [personnel.userId],
       name: "custody_events_from_custodian_personnel_id_fk",
     }).onDelete("set null"),
     foreignKey({
       columns: [table.toCustodian],
-      foreignColumns: [personnel.id],
+      foreignColumns: [personnel.userId],
       name: "custody_events_to_custodian_personnel_id_fk",
     }).onDelete("set null"),
     foreignKey({
       columns: [table.recordedBy],
-      foreignColumns: [personnel.id],
+      foreignColumns: [personnel.userId],
       name: "custody_events_recorded_by_personnel_id_fk",
     }).onDelete("restrict"),
   ],

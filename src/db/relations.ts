@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm/relations";
+import { userInNeonAuth } from "./neon-auth-user";
 import {
   attachments,
   caseNotes,
@@ -30,7 +31,11 @@ export const caseNotesRelations = relations(caseNotes, ({ one }) => ({
   }),
 }));
 
-export const personnelRelations = relations(personnel, ({ many }) => ({
+export const personnelRelations = relations(personnel, ({ one, many }) => ({
+  user: one(userInNeonAuth, {
+    fields: [personnel.userId],
+    references: [userInNeonAuth.id],
+  }),
   evidenceAsCustodian: many(evidence),
   custodyEventsFrom: many(custodyEvents, { relationName: "fromCustodian" }),
   custodyEventsTo: many(custodyEvents, { relationName: "toCustodian" }),
@@ -44,7 +49,7 @@ export const evidenceRelations = relations(evidence, ({ one, many }) => ({
   }),
   currentCustodianPerson: one(personnel, {
     fields: [evidence.currentCustodian],
-    references: [personnel.id],
+    references: [personnel.userId],
   }),
   custodyEvents: many(custodyEvents),
   attachments: many(attachments),
@@ -57,17 +62,17 @@ export const custodyEventsRelations = relations(custodyEvents, ({ one }) => ({
   }),
   fromCustodianPerson: one(personnel, {
     fields: [custodyEvents.fromCustodian],
-    references: [personnel.id],
+    references: [personnel.userId],
     relationName: "fromCustodian",
   }),
   toCustodianPerson: one(personnel, {
     fields: [custodyEvents.toCustodian],
-    references: [personnel.id],
+    references: [personnel.userId],
     relationName: "toCustodian",
   }),
   recordedByPerson: one(personnel, {
     fields: [custodyEvents.recordedBy],
-    references: [personnel.id],
+    references: [personnel.userId],
     relationName: "recordedBy",
   }),
 }));

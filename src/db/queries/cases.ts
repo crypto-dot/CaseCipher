@@ -5,11 +5,17 @@ import type {
   Case,
   CasePriority,
   CaseStatus,
+  CaseWithClient,
   NewCase,
   UpdateCaseData,
 } from "@/lib/types/case-types";
 
-export type { Case, NewCase, UpdateCaseData } from "@/lib/types/case-types";
+export type {
+  Case,
+  CaseWithClient,
+  NewCase,
+  UpdateCaseData,
+} from "@/lib/types/case-types";
 
 export interface ListCasesOptions {
   userId?: string;
@@ -24,7 +30,9 @@ export interface ListCasesOptions {
 /**
  * List cases with optional filters
  */
-export async function listCases(options: ListCasesOptions = {}) {
+export async function listCases(
+  options: ListCasesOptions = {},
+): Promise<CaseWithClient[]> {
   const {
     status,
     priority,

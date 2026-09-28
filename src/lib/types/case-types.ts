@@ -4,6 +4,7 @@ import {
   attachmentSchema,
   createAttachmentSchema,
 } from "@/lib/types/attachment-types";
+import type { Client } from "@/lib/types/client-types";
 
 /** Kanban / workflow stages — status values match board column ids. */
 export const CASE_STAGES = [
@@ -57,7 +58,6 @@ export const caseSchema = z.object({
   title: z.string().min(1),
   clientId: z.uuid().nullable(),
   caseType: z.string().nullable(),
-  requestor: z.string().nullable(),
   assignedExaminer: z.string().nullable(),
   subjectName: z.string().nullable(),
   department: z.string().nullable(),
@@ -75,6 +75,8 @@ export const caseSchema = z.object({
 }) satisfies z.ZodType<typeof cases.$inferSelect>;
 
 export type Case = z.infer<typeof caseSchema>;
+
+export type CaseWithClient = Case & { client: Client | null };
 
 /** @deprecated Use `Case` */
 export type CaseItem = Case;

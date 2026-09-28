@@ -33,7 +33,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useCases, useCreateCase } from "@/lib/case-hooks";
+import { useCases, useClients, useCreateCase } from "@/lib/case-hooks";
+import { MOCK_CLIENTS } from "@/lib/mocks";
 import {
   DEFAULT_CASE_NUMBERING_RULE,
   previewNextNumber,
@@ -58,13 +59,15 @@ const optionalDate = z
   .optional()
   .or(z.literal(""));
 
+const NONE_CLIENT = "__none__";
+
 const newCaseSchema = z.object({
   caseNumber: optionalText,
   caseName: z.string().trim().min(3, "Case name must be at least 3 characters"),
   status: caseStatusSchema,
   priority: casePrioritySchema,
   caseType: caseTypeSchema,
-  requestor: optionalText,
+  clientId: z.string().optional(),
   assignedExaminer: optionalText,
   subjectName: optionalText,
   department: optionalText,
@@ -86,6 +89,7 @@ function titleCase(value: string) {
 export default function NewCasePage() {
   const router = useRouter();
   const casesQuery = useCases();
+  const clientsQuery = useClients();
   const createCaseMut = useCreateCase();
   const [caseNumberingRule, setCaseNumberingRule] = React.useState(
     DEFAULT_CASE_NUMBERING_RULE,
@@ -107,6 +111,11 @@ export default function NewCasePage() {
     [caseNumberingRule, casesQuery.data],
   );
 
+  const clients = React.useMemo(() => {
+    const fromApi = clientsQuery.data ?? [];
+    return fromApi.length > 0 ? fromApi : MOCK_CLIENTS;
+  }, [clientsQuery.data]);
+
   const form = useForm<NewCaseTypes>({
     resolver: zodResolver(newCaseSchema),
     defaultValues: {
@@ -116,7 +125,7 @@ export default function NewCasePage() {
       status: "new_case",
       priority: "medium",
       caseType: "HR Misconduct",
-      requestor: "",
+      clientId: NONE_CLIENT,
       assignedExaminer: "",
       subjectName: "",
       department: "",
@@ -134,7 +143,10 @@ export default function NewCasePage() {
       status: values.status,
       priority: values.priority,
       caseType: values.caseType,
-      requestor: values.requestor,
+      clientId:
+        values.clientId && values.clientId !== NONE_CLIENT
+          ? values.clientId
+          : undefined,
       assignedExaminer: values.assignedExaminer,
       subjectName: values.subjectName,
       department: values.department,
@@ -292,16 +304,29 @@ export default function NewCasePage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField
                   control={form.control}
-                  name="requestor"
+                  name="clientId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Requestor</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g. HR Department, Legal"
-                          {...field}
-                        />
-                      </FormControl>
+                      <FormLabel>Client</FormLabel>
+                      <Select
+                        value={field.value ?? NONE_CLIENT}
+                        onValueChange={field.onChange}
+                        disabled={clientsQuery.isLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a client" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={NONE_CLIENT}>No client</SelectItem>
+                          {clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

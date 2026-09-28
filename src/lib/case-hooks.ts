@@ -8,6 +8,7 @@ import {
   listCaseAttachments,
   uploadCaseAttachments,
 } from "@/app/actions/attachments";
+import { listClients } from "@/app/actions/clients";
 import {
   type CreateCaseFormInput,
   createCase,
@@ -23,6 +24,7 @@ import {
 
 const keys = {
   cases: ["cases"] as const,
+  clients: ["clients"] as const,
   evidence: ["evidence"] as const,
   attachments: ["case-attachments"] as const,
 };
@@ -31,6 +33,13 @@ export function useCases() {
   return useQuery({
     queryKey: keys.cases,
     queryFn: listCases,
+  });
+}
+
+export function useClients() {
+  return useQuery({
+    queryKey: keys.clients,
+    queryFn: () => listClients(),
   });
 }
 
@@ -99,7 +108,13 @@ export function useAllCaseAttachments() {
 export function useAddCaseAttachments() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ caseId, files }: { caseId: string; files: File[] }) => {
+    mutationFn: async ({
+      caseId,
+      files,
+    }: {
+      caseId: string;
+      files: File[];
+    }) => {
       const formData = new FormData();
       formData.set("caseId", caseId);
       for (const file of files) {

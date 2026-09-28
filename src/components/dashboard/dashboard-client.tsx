@@ -32,10 +32,16 @@ import {
 import {
   useAllCaseAttachments,
   useCases,
+  useClients,
   useReassignCase,
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
-import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
+import {
+  type Assignee,
+  getAssigneeById,
+  mockAssignees,
+  resolveClientName,
+} from "@/lib/mocks";
 import { priorityLabel, priorityPillClass } from "@/lib/priority-colors";
 import { stageDotClass } from "@/lib/stage-colors";
 import {
@@ -97,9 +103,13 @@ function lastActivityLabel(iso: string) {
   return `${days}d since last activity`;
 }
 
-function caseCategoryLabel(c: Case) {
+function caseCategoryLabel(
+  c: Case,
+  clients: Array<{ id: string; name: string }> = [],
+) {
   if (c.caseType) return c.caseType;
-  if (c.requestor) return c.requestor;
+  const clientName = resolveClientName(c.clientId, clients);
+  if (clientName) return clientName;
   const t = c.title.trim();
   const colon = t.indexOf(":");
   if (colon > 0 && colon < 24) return t.slice(0, colon).trim();
@@ -110,6 +120,7 @@ function caseCategoryLabel(c: Case) {
 function CaseBoardColumn({
   attachmentsByCase,
   cases,
+  clients,
   column,
   dragPlaceholderHeight,
   draggedFromColumnId,
@@ -122,6 +133,7 @@ function CaseBoardColumn({
 }: {
   attachmentsByCase: Record<string, CaseAttachment[]>;
   cases: Case[];
+  clients: Array<{ id: string; name: string }>;
   column: BoardColumn;
   dragPlaceholderHeight: number | null;
   draggedFromColumnId: BoardColumnId | null;
@@ -193,6 +205,7 @@ function CaseBoardColumn({
               <CaseBoardCard
                 key={caseItem.id}
                 caseItem={caseItem}
+                clients={clients}
                 fileCount={attachmentsByCase[caseItem.id]?.length ?? 0}
                 isStatusUpdating={isStatusUpdating}
                 onOpen={onOpenCase}
@@ -210,6 +223,7 @@ function CaseBoardColumn({
 
 function CaseBoardCard({
   caseItem,
+  clients,
   fileCount,
   isStatusUpdating,
   onOpen,
@@ -218,6 +232,7 @@ function CaseBoardCard({
   reassignPending,
 }: {
   caseItem: Case;
+  clients: Array<{ id: string; name: string }>;
   fileCount: number;
   isStatusUpdating: boolean;
   onOpen: (caseId: string) => void;
@@ -283,7 +298,9 @@ function CaseBoardCard({
             className="size-3.5 shrink-0 text-muted-foreground/80"
             aria-hidden
           />
-          <span className="truncate">{caseCategoryLabel(caseItem)}</span>
+          <span className="truncate">
+            {caseCategoryLabel(caseItem, clients)}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <UserRound
@@ -371,6 +388,7 @@ function CaseBoardCard({
 
 export function DashboardClient() {
   const casesQuery = useCases();
+  const clientsQuery = useClients();
   const attachmentsQuery = useAllCaseAttachments();
   const updateStatusMut = useUpdateCaseStatus();
   const reassignMut = useReassignCase();
@@ -384,6 +402,7 @@ export function DashboardClient() {
   } | null>(null);
 
   const cases = casesQuery.data ?? [];
+  const clients = clientsQuery.data ?? [];
   const attachmentsByCase = attachmentsQuery.data ?? {};
   const selectedCase =
     selectedCaseId != null
@@ -523,6 +542,7 @@ export function DashboardClient() {
                   key={col.id}
                   attachmentsByCase={attachmentsByCase}
                   cases={casesByColumn.get(col.id) ?? []}
+                  clients={clients}
                   column={col}
                   dragPlaceholderHeight={dragPreview?.height ?? null}
                   draggedFromColumnId={dragPreview?.draggedFromColumnId ?? null}

@@ -16,7 +16,7 @@ import {
   caseStatusSchema,
 } from "@/lib/types/case-types";
 
-const STORAGE_KEY = "casecipher:cases:v4";
+const STORAGE_KEY = "casecipher:cases:v5";
 
 function nowIso() {
   return new Date().toISOString();
@@ -72,7 +72,7 @@ export type CreateCaseFormInput = {
   status: CaseStatus;
   priority: CasePriority;
   caseType?: string;
-  requestor?: string;
+  clientId?: string;
   assignedExaminer?: string;
   subjectName?: string;
   department?: string;
@@ -100,9 +100,8 @@ export async function createCase(input: CreateCaseFormInput): Promise<Case> {
     id: crypto.randomUUID(),
     caseNumber: input.caseNumber?.trim() || makeCaseNumber(items),
     title: input.caseName.trim(),
-    clientId: null,
+    clientId: input.clientId ?? null,
     caseType: input.caseType?.trim() || null,
-    requestor: input.requestor?.trim() || null,
     assignedExaminer: input.assignedExaminer?.trim() || null,
     subjectName: input.subjectName?.trim() || null,
     department: input.department?.trim() || null,

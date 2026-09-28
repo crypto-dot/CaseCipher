@@ -32,11 +32,17 @@ import { attachmentKey, formatFileSize } from "@/lib/attachments";
 import {
   useAddCaseAttachments,
   useCaseAttachments,
+  useClients,
   useReassignCase,
   useRemoveCaseAttachment,
   useUpdateCaseStatus,
 } from "@/lib/case-hooks";
-import { type Assignee, getAssigneeById, mockAssignees } from "@/lib/mocks";
+import {
+  type Assignee,
+  getAssigneeById,
+  mockAssignees,
+  resolveClientName,
+} from "@/lib/mocks";
 import { priorityLabel, priorityPillClass } from "@/lib/priority-colors";
 import {
   type Case,
@@ -71,6 +77,7 @@ export function CaseDetailModal({
   const [isDragging, setIsDragging] = React.useState(false);
 
   const attachmentsQuery = useCaseAttachments(caseItem?.id ?? null);
+  const clientsQuery = useClients();
   const addAttachmentsMut = useAddCaseAttachments();
   const removeAttachmentMut = useRemoveCaseAttachment();
   const updateStatusMut = useUpdateCaseStatus();
@@ -85,7 +92,7 @@ export function CaseDetailModal({
     async (files: FileList | File[] | null) => {
       if (!caseItem || !files?.length) return;
 
-     const data = await addAttachmentsMut.mutateAsync({
+      const data = await addAttachmentsMut.mutateAsync({
         caseId: caseItem.id,
         files: Array.from(files),
       });
@@ -117,7 +124,7 @@ export function CaseDetailModal({
 
   const caseDetails = [
     ["Case type", caseItem.caseType],
-    ["Requestor", caseItem.requestor],
+    ["Client", resolveClientName(caseItem.clientId, clientsQuery.data ?? [])],
     ["Subject name", caseItem.subjectName],
     ["Department", caseItem.department],
     ["Date received", caseItem.dateReceived],

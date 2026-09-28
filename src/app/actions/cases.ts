@@ -56,7 +56,6 @@ export async function createCase(
     caseNumber: input.caseNumber?.trim() || null,
     clientId: input.clientId ?? null,
     caseType: input.caseType?.trim() || null,
-    requestor: input.requestor?.trim() || null,
     assignedExaminer: input.assignedExaminer?.trim() || null,
     subjectName: input.subjectName?.trim() || null,
     department: input.department?.trim() || null,
